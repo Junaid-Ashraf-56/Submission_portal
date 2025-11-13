@@ -1,0 +1,263 @@
+assignment-portal/
+│
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/
+│   │   │       └── university/
+│   │   │           └── portal/
+│   │   │               │
+│   │   │               ├── AssignmentPortalApplication.java
+│   │   │               │
+│   │   │               ├── config/
+│   │   │               │   ├── SecurityConfig.java
+│   │   │               │   ├── AsyncConfig.java
+│   │   │               │   ├── SchedulingConfig.java
+│   │   │               │   └── WebConfig.java
+│   │   │               │
+│   │   │               ├── entity/
+│   │   │               │   ├── User.java
+│   │   │               │   ├── Student.java
+│   │   │               │   ├── Assignment.java
+│   │   │               │   ├── Submission.java
+│   │   │               │   ├── PasswordResetToken.java
+│   │   │               │   └── EmailLog.java
+│   │   │               │
+│   │   │               ├── enums/
+│   │   │               │   ├── Role.java
+│   │   │               │   ├── Gender.java
+│   │   │               │   └── AssignmentType.java
+│   │   │               │
+│   │   │               ├── repository/
+│   │   │               │   ├── UserRepository.java
+│   │   │               │   ├── StudentRepository.java
+│   │   │               │   ├── AssignmentRepository.java
+│   │   │               │   ├── SubmissionRepository.java
+│   │   │               │   ├── PasswordResetTokenRepository.java
+│   │   │               │   └── EmailLogRepository.java
+│   │   │               │
+│   │   │               ├── service/
+│   │   │               │   ├── UserService.java
+│   │   │               │   ├── StudentService.java
+│   │   │               │   ├── AssignmentService.java
+│   │   │               │   ├── SubmissionService.java
+│   │   │               │   ├── FileStorageService.java
+│   │   │               │   ├── FileValidationService.java
+│   │   │               │   ├── ZipService.java
+│   │   │               │   ├── EmailService.java
+│   │   │               │   ├── PasswordResetService.java
+│   │   │               │   └── ReminderSchedulerService.java
+│   │   │               │
+│   │   │               ├── controller/
+│   │   │               │   ├── AuthController.java
+│   │   │               │   ├── StudentDashboardController.java
+│   │   │               │   ├── StudentAssignmentController.java
+│   │   │               │   ├── CRDashboardController.java
+│   │   │               │   ├── CRAssignmentController.java
+│   │   │               │   ├── CRSubmissionController.java
+│   │   │               │   ├── PasswordResetController.java
+│   │   │               │   └── ProfileController.java
+│   │   │               │
+│   │   │               ├── dto/
+│   │   │               │   ├── request/
+│   │   │               │   │   ├── LoginRequest.java
+│   │   │               │   │   ├── PasswordChangeRequest.java
+│   │   │               │   │   ├── AssignmentCreateRequest.java
+│   │   │               │   │   ├── SubmissionRequest.java
+│   │   │               │   │   ├── OTPRequest.java
+│   │   │               │   │   ├── OTPVerificationRequest.java
+│   │   │               │   │   └── PasswordResetRequest.java
+│   │   │               │   │
+│   │   │               │   └── response/
+│   │   │               │       ├── AssignmentDTO.java
+│   │   │               │       ├── SubmissionDTO.java
+│   │   │               │       ├── StudentDTO.java
+│   │   │               │       ├── AssignmentStatsDTO.java
+│   │   │               │       └── ApiResponse.java
+│   │   │               │
+│   │   │               ├── exception/
+│   │   │               │   ├── GlobalExceptionHandler.java
+│   │   │               │   ├── ResourceNotFoundException.java
+│   │   │               │   ├── DeadlinePassedException.java
+│   │   │               │   ├── InvalidFileTypeException.java
+│   │   │               │   ├── FileSizeExceededException.java
+│   │   │               │   ├── DuplicateSubmissionException.java
+│   │   │               │   ├── InvalidOTPException.java
+│   │   │               │   ├── UnauthorizedAccessException.java
+│   │   │               │   └── EmailSendingException.java
+│   │   │               │
+│   │   │               ├── security/
+│   │   │               │   ├── CustomUserDetailsService.java
+│   │   │               │   ├── SecurityUtils.java
+│   │   │               │   └── PasswordValidator.java
+│   │   │               │
+│   │   │               ├── util/
+│   │   │               │   ├── OTPGenerator.java
+│   │   │               │   ├── FileNameSanitizer.java
+│   │   │               │   ├── DateTimeUtils.java
+│   │   │               │   ├── EmailTemplateBuilder.java
+│   │   │               │   └── Constants.java
+│   │   │               │
+│   │   │               └── validation/
+│   │   │                   ├── FileValidator.java
+│   │   │                   ├── DeadlineValidator.java
+│   │   │                   └── CustomValidators.java
+│   │   │
+│   │   └── resources/
+│   │       ├── application.properties
+│   │       ├── application-dev.properties
+│   │       ├── application-prod.properties
+│   │       │
+│   │       ├── static/
+│   │       │   ├── css/
+│   │       │   │   ├── style.css
+│   │       │   │   ├── login.css
+│   │       │   │   ├── dashboard.css
+│   │       │   │   ├── forms.css
+│   │       │   │   ├── tables.css
+│   │       │   │   └── responsive.css
+│   │       │   │
+│   │       │   ├── js/
+│   │       │   │   ├── main.js
+│   │       │   │   ├── fileUpload.js
+│   │       │   │   ├── formValidation.js
+│   │       │   │   ├── countdown.js
+│   │       │   │   ├── notifications.js
+│   │       │   │   └── otpInput.js
+│   │       │   │
+│   │       │   └── images/
+│   │       │       ├── logo.png
+│   │       │       ├── university-logo.png
+│   │       │       ├── default-avatar.png
+│   │       │       ├── empty-state-assignments.svg
+│   │       │       └── empty-state-submissions.svg
+│   │       │
+│   │       ├── templates/
+│   │       │   │
+│   │       │   ├── fragments/
+│   │       │   │   ├── header.html
+│   │       │   │   ├── footer.html
+│   │       │   │   ├── navbar-student.html
+│   │       │   │   ├── navbar-cr.html
+│   │       │   │   ├── assignment-card.html
+│   │       │   │   └── toast-notification.html
+│   │       │   │
+│   │       │   ├── auth/
+│   │       │   │   ├── login.html
+│   │       │   │   ├── first-login-change-password.html
+│   │       │   │   ├── forgot-password.html
+│   │       │   │   ├── verify-otp.html
+│   │       │   │   └── reset-password.html
+│   │       │   │
+│   │       │   ├── student/
+│   │       │   │   ├── dashboard.html
+│   │       │   │   ├── assignment-detail.html
+│   │       │   │   ├── submit-assignment.html
+│   │       │   │   ├── submission-success.html
+│   │       │   │   ├── view-my-submission.html
+│   │       │   │   └── profile.html
+│   │       │   │
+│   │       │   ├── cr/
+│   │       │   │   ├── dashboard.html
+│   │       │   │   ├── create-assignment.html
+│   │       │   │   ├── edit-assignment.html
+│   │       │   │   ├── extend-deadline.html
+│   │       │   │   ├── view-submissions.html
+│   │       │   │   ├── submission-statistics.html
+│   │       │   │   └── profile.html
+│   │       │   │
+│   │       │   └── error/
+│   │       │       ├── 403.html
+│   │       │       ├── 404.html
+│   │       │       └── 500.html
+│   │       │
+│   │       ├── data.sql
+│   │       └── schema.sql
+│   │
+│   └── test/
+│       └── java/
+│           └── com/
+│               └── university/
+│                   └── portal/
+│                       ├── service/
+│                       │   ├── UserServiceTest.java
+│                       │   ├── AssignmentServiceTest.java
+│                       │   ├── SubmissionServiceTest.java
+│                       │   ├── FileValidationServiceTest.java
+│                       │   ├── ZipServiceTest.java
+│                       │   ├── EmailServiceTest.java
+│                       │   └── PasswordResetServiceTest.java
+│                       │
+│                       ├── controller/
+│                       │   ├── AuthControllerTest.java
+│                       │   ├── StudentDashboardControllerTest.java
+│                       │   ├── CRAssignmentControllerTest.java
+│                       │   └── PasswordResetControllerTest.java
+│                       │
+│                       ├── repository/
+│                       │   ├── UserRepositoryTest.java
+│                       │   ├── AssignmentRepositoryTest.java
+│                       │   └── SubmissionRepositoryTest.java
+│                       │
+│                       └── integration/
+│                           ├── SubmissionFlowIntegrationTest.java
+│                           ├── PasswordResetFlowIntegrationTest.java
+│                           └── EmailNotificationIntegrationTest.java
+│
+├── cpp/                                    [C++ MODULE]
+│   ├── include/
+│   │   ├── FileHandler.h
+│   │   ├── ZipCreator.h
+│   │   ├── FileValidator.h
+│   │   └── FilenameSanitizer.h
+│   │
+│   ├── src/
+│   │   ├── FileHandler.cpp
+│   │   ├── ZipCreator.cpp
+│   │   ├── FileValidator.cpp
+│   │   └── FilenameSanitizer.cpp
+│   │
+│   ├── jni/
+│   │   ├── NativeFileHandlerImpl.cpp
+│   │   └── com_university_portal_NativeFileHandler.h
+│   │
+│   ├── lib/
+│   │   └── minizip/
+│   │
+│   ├── CMakeLists.txt
+│   └── build/
+│
+├── java-core/                              [JAVA CORE MODULE]
+│   └── src/
+│       └── com/
+│           └── university/
+│               └── utils/
+│                   ├── OTPGenerator.java
+│                   ├── EmailTemplateBuilder.java
+│                   ├── DateTimeValidator.java
+│                   ├── PasswordEncryptor.java
+│                   ├── ByteConverter.java
+│                   └── DeadlineChecker.java
+│
+├── docs/
+│   ├── README.md
+│   ├── SETUP.md
+│   ├── API_DOCUMENTATION.md
+│   ├── DATABASE_SCHEMA.md
+│   ├── DEPLOYMENT_GUIDE.md
+│   ├── USER_MANUAL.md
+│   ├── EMAIL_TEMPLATES.md
+│   └── ARCHITECTURE.md
+│
+├── scripts/
+│   ├── init-database.sql
+│   ├── insert-students.sql
+│   ├── sample-assignments.sql
+│   └── cleanup-old-data.sql
+│
+├── .gitignore
+├── pom.xml
+├── mvnw
+├── mvnw.cmd
+├── render.yaml
+└── README.md
