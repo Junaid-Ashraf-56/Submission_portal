@@ -1,19 +1,19 @@
 package com.web.submission_portal.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Table(name = "submission",
+@Table(name = "submissions",
         uniqueConstraints = @UniqueConstraint(columnNames = {"student_id", "assignment_id"}))
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
+@Setter
 
 public class Submission {
     @Id

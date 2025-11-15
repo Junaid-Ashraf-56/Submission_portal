@@ -2,10 +2,7 @@ package com.web.submission_portal.entity;
 
 import com.web.submission_portal.enums.Gender;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -16,6 +13,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 
 public class Student {
 

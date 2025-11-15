@@ -2,10 +2,8 @@ package com.web.submission_portal.entity;
 
 import com.web.submission_portal.enums.Assignment_Type;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,11 +13,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
+@Getter
+@Setter
 public class Assignment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int assignment_id;
+    private long assignment_id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

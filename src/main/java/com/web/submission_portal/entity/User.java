@@ -2,10 +2,7 @@ package com.web.submission_portal.entity;
 
 import com.web.submission_portal.enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
+@Setter
 
 public class User {
     @Id
@@ -45,8 +44,6 @@ public class User {
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
     private Student student;
 
-    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
-    private List<Assignment> assignments;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Password_Reset_T> passwordResetTokens;
