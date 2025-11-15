@@ -2,16 +2,18 @@ package com.web.submission_portal.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "email_logs")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 
 public class Email_Logs {
     @Id
@@ -19,16 +21,20 @@ public class Email_Logs {
     private int email_id;
 
     @Column(nullable = false)
-    private String recepient;
+    private String recipient;
 
-    @Column(nullable = false)
+    @Column(nullable = false,length = 500)
     private String subject;
 
     @Column(nullable = false)
-    private Timestamp timestamp;
+    private LocalDateTime sent_at;
 
-    @Column(nullable = false)
+    @Column(nullable = false,length = 50)
     private String status;
 
 
+    @PrePersist
+    protected void onCreate() {
+        sent_at = LocalDateTime.now();
+    }
 }
