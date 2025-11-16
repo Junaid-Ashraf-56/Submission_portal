@@ -12,9 +12,7 @@ import java.util.List;
 @Table(name = "assignments")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Getter
-@Setter
+
 public class Assignment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

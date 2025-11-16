@@ -12,15 +12,12 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @AllArgsConstructor
-@Builder
-@Getter
-@Setter
 
 public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int student_id;
+    private long student_id;
 
     @Column(unique = true,nullable = false,length = 100)
     private String roll_no;

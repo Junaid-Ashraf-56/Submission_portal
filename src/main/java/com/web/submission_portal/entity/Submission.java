@@ -11,14 +11,12 @@ import java.time.LocalDateTime;
         uniqueConstraints = @UniqueConstraint(columnNames = {"student_id", "assignment_id"}))
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Getter
-@Setter
+
 
 public class Submission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int submission_id;
+    private long submission_id;
 
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)

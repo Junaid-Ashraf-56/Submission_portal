@@ -10,14 +10,12 @@ import java.time.LocalDateTime;
 @Table(name = "password_reset_tokens")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Getter
-@Setter
+
 
 public class Password_Reset_T {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int token_id;
+    private long token_id;
 
     @Column(nullable = false,length = 6)
     private int otp;

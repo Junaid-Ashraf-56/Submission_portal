@@ -5,21 +5,17 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name="users")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Getter
-@Setter
 
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int user_id;
+    private Long user_id;
 
     @Column(unique = true,nullable = false)
     private String email;
@@ -34,7 +30,7 @@ public class User {
     @Column(nullable = false , length = 40)
     private Role role;
 
-    @Column(name = "created_at",nullable = false,updatable = false)
+    @Column(nullable = false,updatable = false)
     private LocalDateTime created_at;
 
     @PrePersist
@@ -43,9 +39,4 @@ public class User {
     }
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
     private Student student;
-
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Password_Reset_T> passwordResetTokens;
-
 }
