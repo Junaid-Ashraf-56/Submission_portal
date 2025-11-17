@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface AssignmentRepository extends JpaRepository<Assignment,Long> {
-    List<Assignment> findBySubject_code(String subject_code);
+    List<Assignment> findBySubjectCode(String subject_code);
     List<Assignment> findByCreatedByUserId(Long userId);
     List<Assignment> findByStartTimeBeforeAndEndTimeAfter(LocalDateTime now1, LocalDateTime now2);
     List<Assignment> findByEndTimeBetween(LocalDateTime start, LocalDateTime end);

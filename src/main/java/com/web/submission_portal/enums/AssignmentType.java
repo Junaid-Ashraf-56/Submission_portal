@@ -1,6 +1,6 @@
 package com.web.submission_portal.enums;
 
-public enum Assignment_Type {
+public enum AssignmentType {
     LAB,
     THEORY
 }

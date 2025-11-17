@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student,Long> {
-    List<Student> findByRoll_no(String roll_no);
-    List<Student> findByUser_id(Long user_id);
-    List<Student> getAll();
+    List<Student> findByRollNo(String roll_no);
+    List<Student> findByUserUserId(Long user_id);
 }

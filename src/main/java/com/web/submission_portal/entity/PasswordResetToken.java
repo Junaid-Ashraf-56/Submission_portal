@@ -1,36 +1,35 @@
 package com.web.submission_portal.entity;
 
-import com.web.submission_portal.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users")
+@Table(name = "password_reset_tokens")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 
-public class User {
+public class PasswordResetToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long tokenId;
 
-    @Column(unique = true, nullable = false)
-    private String email;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(nullable = false, length = 6)
+    private String otp;
 
     @Column(nullable = false)
-    private String password;
+    private LocalDateTime expiryTime;
 
     @Column(nullable = false)
-    private Boolean isFirstLogin = true;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private Role role;
+    private Boolean used = false;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

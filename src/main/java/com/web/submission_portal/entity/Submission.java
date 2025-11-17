@@ -6,17 +6,18 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
 @Table(name = "submissions",
         uniqueConstraints = @UniqueConstraint(columnNames = {"student_id", "assignment_id"}))
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
-
+@AllArgsConstructor
 
 public class Submission {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long submission_id;
+    private Long submissionId;
 
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)
@@ -26,24 +27,25 @@ public class Submission {
     @JoinColumn(name = "assignment_id", nullable = false)
     private Assignment assignment;
 
-    @Column(nullable = false,length = 500)
-    private String file_path;
+    @Column(nullable = false)
+    private String fileName;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "file_data", columnDefinition = "BYTEA")
+    private byte[] fileData;
 
     @Column(nullable = false)
-    private LocalDateTime submitted_at;
+    private Long fileSize;
 
-    @Column(nullable = false)
-    private String file_name;
+    @Column(length = 500)
+    private String filePath; // Optional: for future S3/cloud storage
 
-    @Column(nullable = false)
-    private String fileUrl;
-
-    @Column(nullable = false)
-    private int file_size;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime submittedAt;
 
     @PrePersist
     protected void onCreate() {
-        submitted_at = LocalDateTime.now();
+        submittedAt = LocalDateTime.now();
     }
-
 }

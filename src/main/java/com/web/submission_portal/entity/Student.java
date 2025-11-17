@@ -9,33 +9,31 @@ import java.util.List;
 
 @Entity
 @Table(name = "students")
+@Getter
+@Setter
 @NoArgsConstructor
-@Data
 @AllArgsConstructor
 
 public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long student_id;
+    private Long studentId;
 
-    @Column(unique = true,nullable = false,length = 100)
-    private String roll_no;
+    @Column(unique = true, nullable = false, length = 20)
+    private String rollNo;
 
-    @Column(nullable = false,length = 100)
+    @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(unique = true,length = 50)
-    private String phone_number;
+    @Column(length = 15)
+    private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false,length = 50)
+    @Column(nullable = false, length = 10)
     private Gender gender;
 
     @OneToOne
-    @JoinColumn(name = "user_id",nullable = false,unique = true)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
-
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
-    private List<Submission> submissions;
 }
