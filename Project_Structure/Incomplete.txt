@@ -1,0 +1,366 @@
+🚀 Revised 25-Day Timeline (Enhanced Version)
+
+⏱️ New Schedule: 3-4 hours daily
+
+📅 WEEK 1: Foundation (Days 1-7)
+Day 1: Setup & Database (3 hours)
+
+Create Spring Boot project with all dependencies
+Setup PostgreSQL connection
+Create all 6 entities (already done ✅)
+Create schema.sql, run and verify tables created
+Insert 5 test students in data.sql
+
+Day 2: Repositories & Testing (3 hours)
+
+Create all 6 repository interfaces
+Custom methods: findByEmail, findByRollno, findByAssignmentId, etc.
+Test each repository (save, find, delete operations)
+Verify relationships work (User ↔ Student, Assignment ↔ Submission)
+
+Day 3: Spring Security Setup (4 hours)
+
+Create SecurityConfig class
+Configure HttpSecurity (which URLs need auth)
+Create CustomUserDetailsService (load user from DB)
+Password encoder (BCryptPasswordEncoder)
+Session management
+
+Day 4: Login & Authentication (3.5 hours)
+
+Create login.html page
+AuthController (GET /login, POST /login)
+Test login with 3 different users
+Role-based redirect (Student → /student/dashboard, CR → /cr/dashboard)
+Logout functionality
+
+Day 5: Student Dashboard (3 hours)
+
+Create StudentDashboardController
+Create dashboard.html (navbar, welcome message, assignment cards section)
+Fetch active assignments (empty for now)
+Display "No active assignments" message
+
+Day 6: CR Dashboard (3.5 hours)
+
+Create CRDashboardController
+Create CR dashboard.html
+Section 1: "My Tasks" (student view)
+Section 2: "Manage Assignments" (admin view with create button)
+Test both views side-by-side
+
+Day 7: Assignment Creation (4 hours)
+
+Create AssignmentService class
+Create create-assignment.html form (all fields + datetime pickers)
+POST /cr/assignments endpoint
+Validation: start_time < end_time, deadline in future
+Success message after creation
+Test: create 3 different assignments
+
+Week 1 Checkpoint: Login with Spring Security working, dashboards ready, assignments can be created
+
+📅 WEEK 2: File Upload System (Days 8-14)
+Day 8: File Validation Service (3 hours)
+
+Create FileValidator class
+Check extension: PDF, DOC, DOCX, XLS, XLSX only
+Check size: max 10MB
+Sanitize filename (remove ../, special chars)
+Unit test validator with valid/invalid files
+
+Day 9: File Storage Service (3 hours)
+
+Create FileStorageService class
+Method: convertToBytes(MultipartFile)
+Method: saveFile(byte[], Submission)
+Method: retrieveFile(submissionId)
+Test: manually save and retrieve a PDF
+
+Day 10: Submission Service (4 hours)
+
+Create SubmissionService class
+Method: submitAssignment(studentId, assignmentId, file)
+Check: student hasn't submitted already
+Check: current time between start_time and end_time
+Validate file with FileValidator
+Save to database with @Transactional
+Return success/error DTO
+
+Day 11: Student Upload Page (3.5 hours)
+
+Update student dashboard: show assignments with "Submit" button
+Create submit-assignment.html
+File input with drag-drop (optional) or simple button
+Show assignment title, description, deadline
+Warning: "Cannot submit after deadline"
+POST /student/assignments/{id}/submit endpoint
+
+Day 12: Submission Success & View (3 hours)
+
+Create submission-success.html page
+Update student dashboard: show "Submitted ✓" badge for submitted assignments
+Hide submit button, show "View Submission" link
+Create view-my-submission.html (show filename, size, timestamp, download button)
+Test full flow: login → upload → success → view
+
+Day 13: CR View Submissions (4 hours)
+
+Create view-submissions.html page
+Table: Roll Number, Name, File Name, File Size, Submitted At, Download button
+Show statistics at top: "28/40 submitted (70%)"
+Highlight CR's own submission (different row color)
+GET /cr/assignments/{id}/submissions endpoint
+Test: view submissions for 2 different assignments
+
+Day 14: Individual File Download (3 hours)
+
+Add download icon in each row of submissions table
+GET /cr/submissions/{id}/download endpoint
+Stream file from database to browser (proper headers)
+Security: verify logged-in user is CR
+Test: download 5 different file types (PDF, DOC, etc.)
+
+Week 2 Checkpoint: Students upload files, CR sees list, individual downloads working
+
+📅 WEEK 3: Advanced Features (Days 15-21)
+Day 15: ZIP Download Service (4 hours)
+
+Create ZipService class
+Method: createZip(List<Submission>)
+Filename format: rollno_studentname_originalfilename.ext
+Example: sp24-bse-051_Ahmed_Ali_assignment1.pdf
+Stream ZIP directly to response (no temp files)
+Test with 10 submissions
+
+Day 16: Bulk ZIP Download (3 hours)
+
+Add "Download All as ZIP" button on view-submissions page
+GET /cr/assignments/{id}/download-all endpoint
+Response filename: assignment1_submissions_2025-11-17.zip
+Test: download ZIP with 15 files
+Test: open ZIP and verify all files present
+
+Day 17: First Login Password Change (4 hours)
+
+Create first-login-change-password.html page
+Check is_first_login flag after login
+If true → redirect to password change page
+Form: new password + confirm password
+Update password (BCrypt hash)
+Set is_first_login = false
+Test: login with fresh account
+
+Day 18: Password Reset via OTP (4 hours)
+
+Create forgot-password.html (enter email)
+Create PasswordResetService: generate 6-digit OTP
+Save OTP in password_reset_tokens table (expiry 10 minutes)
+Create verify-otp.html (6 input boxes)
+Verify OTP: check expiry, not used
+Create reset-password.html (new password form)
+Test full flow: request OTP → verify → reset → login
+
+Day 19: Email Notifications (4 hours)
+
+Sign up for SendGrid (free 100 emails/day)
+Create EmailService class with JavaMailSender
+Enable @Async for background sending
+Create EmailTemplateBuilder class
+Template 1: Assignment Created (send to all students)
+Template 2: Submission Confirmation (send to student)
+Integrate: assignment creation triggers email
+Integrate: submission success triggers email
+Test: verify emails received
+
+Day 20: Deadline Enforcement & Reminders (3.5 hours)
+
+Update SubmissionService: reject if NOW > end_time
+Show error message on upload page
+Create ReminderSchedulerService with @Scheduled
+Cron job: every hour, find assignments due in 5-6 hours
+Send reminder email to students who haven't submitted
+Test: manually set deadline 5 hours ahead, wait for reminder
+
+Day 21: Hierarchical Assignment Organization (4 hours)
+NEW FEATURE: Tree Structure
+
+Add parent_id column to assignments table (self-referencing FK)
+Update Assignment entity: @ManyToOne private Assignment parentAssignment;
+CR can create "Assignment Groups" (e.g., "Data Structures")
+Under groups, create actual assignments (e.g., "Assignment 1", "Assignment 2")
+Student dashboard: show tree view (expandable groups)
+CR dashboard: organize assignments hierarchically
+Benefits: cleaner organization for multiple subjects
+
+Implementation:
+
+Assignment entity: add parentId field
+Create AssignmentGroup vs Assignment distinction (or use isGroup boolean)
+UI: nested cards or accordion for groups
+Test: create 2 groups with 3 assignments each
+
+Week 3 Checkpoint: All features working (upload, download, ZIP, password reset, emails, tree structure)
+
+📅 WEEK 4: Polish & Deploy (Days 22-25)
+Day 22: UI Polish & Styling (4 hours)
+
+Apply consistent CSS to all pages
+Add loading spinners (file upload, ZIP download)
+Toast notifications for success/error messages
+Countdown timer on assignment cards (JavaScript)
+Responsive design (test on mobile)
+Fix any alignment issues
+Test on Chrome, Firefox, Safari
+
+Day 23: Insert All 40 Students & Testing (4 hours)
+
+Update data.sql with all students (sp24-bse-051 to sp24-bse-091)
+Hash all passwords with BCrypt
+Login as 10 different students
+Create 5 assignments (including hierarchical groups)
+Have 10 students submit files
+Test CR features: view, download, ZIP
+Document all bugs found
+
+Day 24: Deploy to Render (4 hours)
+
+Create GitHub repository, push code
+Create Render account
+Create PostgreSQL database (free tier)
+Create web service connected to GitHub
+Configure environment variables (DB URL, SendGrid API key)
+Build command: ./mvnw clean package -DskipTests
+Start command: java -jar target/submission-portal.jar
+Deploy and test live URL
+Verify files persist after redeployment
+
+Day 25: Documentation & Presentation (4 hours)
+
+Write comprehensive README.md
+Create USER_MANUAL.md (with screenshots)
+Record 8-minute demo video:
+
+Student flow (2 min)
+CR flow (3 min)
+Advanced features (2 min)
+Deployment (1 min)
+
+
+Create presentation slides (15 slides)
+Prepare for live demo
+Backup everything (code + database export)
+
+Week 4 Checkpoint: Deployed application + complete documentation
+
+🎯 Features Included
+Core (Must Have):
+
+✅ Spring Security authentication
+✅ Role-based access (Student/CR)
+✅ File upload with validation
+✅ File storage in PostgreSQL BYTEA
+✅ View submissions (CR)
+✅ Download individual files
+✅ Bulk ZIP download
+✅ Deadline enforcement
+
+Advanced (Added):
+
+✅ First login password change
+✅ Password reset via OTP
+✅ Email notifications (SendGrid)
+✅ Scheduled reminder emails
+✅ Hierarchical assignment tree structure (NEW!)
+
+Not Included:
+
+❌ C++ module (not needed for web app)
+❌ Java Core module (using Spring Boot directly)
+❌ Statistics/graphs (can add later if time permits)
+❌ Assignment editing (CR can create only)
+❌ Multiple file uploads per submission
+
+
+🌳 Tree Structure Feature Details
+Database Schema Update:
+sql
+ALTER TABLE assignments ADD COLUMN parent_id BIGINT REFERENCES assignments(assignment_id);
+ALTER TABLE assignments ADD COLUMN is_group BOOLEAN DEFAULT FALSE;
+```
+
+### **Use Cases:**
+
+**Scenario 1: Organize by Subject**
+```
+📁 Data Structures (Group)
+  ├── 📄 Assignment 1: Arrays & LinkedList
+  ├── 📄 Assignment 2: Trees & Graphs
+  └── 📄 Assignment 3: Sorting Algorithms
+
+📁 Web Development (Group)
+  ├── 📄 Lab 1: HTML/CSS
+  └── 📄 Lab 2: JavaScript
+```
+
+**Scenario 2: Multi-Part Assignments**
+```
+📁 Final Project (Group)
+  ├── 📄 Part 1: Proposal
+  ├── 📄 Part 2: Implementation
+  └── 📄 Part 3: Documentation
+```
+
+### **Student View:**
+- Collapsible groups (click to expand/collapse)
+- See only leaf assignments (can submit)
+- Groups are just organizational (no submission)
+
+### **CR View:**
+- Create groups first
+- Create assignments under groups
+- View submissions per group (aggregate stats)
+
+---
+
+## ✅ **Daily Progress Tracker**
+```
+Week 1: Foundation
+[ ] Day 1: Setup
+[ ] Day 2: Repositories
+[ ] Day 3: Security
+[ ] Day 4: Login
+[ ] Day 5: Student Dashboard
+[ ] Day 6: CR Dashboard
+[ ] Day 7: Create Assignment
+
+Week 2: File Upload
+[ ] Day 8: File Validation
+[ ] Day 9: File Storage
+[ ] Day 10: Submission Service
+[ ] Day 11: Upload Page
+[ ] Day 12: Success Flow
+[ ] Day 13: CR View
+[ ] Day 14: Download
+
+Week 3: Advanced
+[ ] Day 15: ZIP Service
+[ ] Day 16: Bulk Download
+[ ] Day 17: First Login Password
+[ ] Day 18: Password Reset OTP
+[ ] Day 19: Email Notifications
+[ ] Day 20: Reminders
+[ ] Day 21: Tree Structure
+
+Week 4: Deploy
+[ ] Day 22: UI Polish
+[ ] Day 23: Full Testing
+[ ] Day 24: Deploy
+[ ] Day 25: Documentation
+
+🚨 Critical Success Milestones
+By Day 7: Can login and create assignments ✅
+By Day 14: Can upload and download files ✅
+By Day 21: All advanced features working ✅
+By Day 25: Deployed with documentation ✅
+s
