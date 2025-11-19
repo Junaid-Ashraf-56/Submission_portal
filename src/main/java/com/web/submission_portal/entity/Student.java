@@ -4,7 +4,6 @@ import com.web.submission_portal.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
 
 
 @Entity
