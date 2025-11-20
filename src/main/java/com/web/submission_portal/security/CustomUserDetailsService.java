@@ -1,6 +1,5 @@
 package com.web.submission_portal.security;
 
-import com.web.submission_portal.entity.User;
 import com.web.submission_portal.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

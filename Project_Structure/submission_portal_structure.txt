@@ -4,16 +4,15 @@ assignment-portal/
 │   ├── main/
 │   │   ├── java/
 │   │   │   └── com/
-│   │   │       └── university/
-│   │   │           └── portal/
+│   │   │       └── web/
+│   │   │           └── submission_portal/
 │   │   │               │
-│   │   │               ├── AssignmentPortalApplication.java
+│   │   │               ├── SubmissionPortalApplication.java
 │   │   │               │
 │   │   │               ├── config/
 │   │   │               │   ├── SecurityConfig.java
 │   │   │               │   ├── AsyncConfig.java
-│   │   │               │   ├── SchedulingConfig.java
-│   │   │               │   └── WebConfig.java
+│   │   │               │   └── SchedulingConfig.java
 │   │   │               │
 │   │   │               ├── entity/
 │   │   │               │   ├── User.java
@@ -55,53 +54,31 @@ assignment-portal/
 │   │   │               │   ├── CRDashboardController.java
 │   │   │               │   ├── CRAssignmentController.java
 │   │   │               │   ├── CRSubmissionController.java
-│   │   │               │   ├── PasswordResetController.java
-│   │   │               │   └── ProfileController.java
+│   │   │               │   └── PasswordResetController.java
 │   │   │               │
 │   │   │               ├── dto/
-│   │   │               │   ├── request/
-│   │   │               │   │   ├── LoginRequest.java
-│   │   │               │   │   ├── PasswordChangeRequest.java
-│   │   │               │   │   ├── AssignmentCreateRequest.java
-│   │   │               │   │   ├── SubmissionRequest.java
-│   │   │               │   │   ├── OTPRequest.java
-│   │   │               │   │   ├── OTPVerificationRequest.java
-│   │   │               │   │   └── PasswordResetRequest.java
-│   │   │               │   │
-│   │   │               │   └── response/
-│   │   │               │       ├── AssignmentDTO.java
-│   │   │               │       ├── SubmissionDTO.java
-│   │   │               │       ├── StudentDTO.java
-│   │   │               │       ├── AssignmentStatsDTO.java
-│   │   │               │       └── ApiResponse.java
+│   │   │               │   ├── AssignmentDTO.java
+│   │   │               │   ├── SubmissionDTO.java
+│   │   │               │   ├── StudentDTO.java
+│   │   │               │   └── AssignmentStatsDTO.java
 │   │   │               │
 │   │   │               ├── exception/
 │   │   │               │   ├── GlobalExceptionHandler.java
 │   │   │               │   ├── ResourceNotFoundException.java
 │   │   │               │   ├── DeadlinePassedException.java
 │   │   │               │   ├── InvalidFileTypeException.java
-│   │   │               │   ├── FileSizeExceededException.java
-│   │   │               │   ├── DuplicateSubmissionException.java
-│   │   │               │   ├── InvalidOTPException.java
-│   │   │               │   ├── UnauthorizedAccessException.java
-│   │   │               │   └── EmailSendingException.java
+│   │   │               │   └── FileSizeExceededException.java
 │   │   │               │
 │   │   │               ├── security/
 │   │   │               │   ├── CustomUserDetailsService.java
-│   │   │               │   ├── SecurityUtils.java
-│   │   │               │   └── PasswordValidator.java
+│   │   │               │   ├── CustomAuthenticationSuccessHandler.java
+│   │   │               │   └── SecurityUtils.java
 │   │   │               │
-│   │   │               ├── util/
-│   │   │               │   ├── OTPGenerator.java
-│   │   │               │   ├── FileNameSanitizer.java
-│   │   │               │   ├── DateTimeUtils.java
-│   │   │               │   ├── EmailTemplateBuilder.java
-│   │   │               │   └── Constants.java
-│   │   │               │
-│   │   │               └── validation/
-│   │   │                   ├── FileValidator.java
-│   │   │                   ├── DeadlineValidator.java
-│   │   │                   └── CustomValidators.java
+│   │   │               └── util/
+│   │   │                   ├── OTPGenerator.java
+│   │   │                   ├── FileNameSanitizer.java
+│   │   │                   ├── DateTimeUtils.java
+│   │   │                   └── EmailTemplateBuilder.java
 │   │   │
 │   │   └── resources/
 │   │       ├── application.properties
@@ -204,56 +181,6 @@ assignment-portal/
 │                           ├── PasswordResetFlowIntegrationTest.java
 │                           └── EmailNotificationIntegrationTest.java
 │
-├── cpp/                                    [C++ MODULE]
-│   ├── include/
-│   │   ├── FileHandler.h
-│   │   ├── ZipCreator.h
-│   │   ├── FileValidator.h
-│   │   └── FilenameSanitizer.h
-│   │
-│   ├── src/
-│   │   ├── FileHandler.cpp
-│   │   ├── ZipCreator.cpp
-│   │   ├── FileValidator.cpp
-│   │   └── FilenameSanitizer.cpp
-│   │
-│   ├── jni/
-│   │   ├── NativeFileHandlerImpl.cpp
-│   │   └── com_university_portal_NativeFileHandler.h
-│   │
-│   ├── lib/
-│   │   └── minizip/
-│   │
-│   ├── CMakeLists.txt
-│   └── build/
-│
-├── java-core/                              [JAVA CORE MODULE]
-│   └── src/
-│       └── com/
-│           └── university/
-│               └── utils/
-│                   ├── OTPGenerator.java
-│                   ├── EmailTemplateBuilder.java
-│                   ├── DateTimeValidator.java
-│                   ├── PasswordEncryptor.java
-│                   ├── ByteConverter.java
-│                   └── DeadlineChecker.java
-│
-├── docs/
-│   ├── README.md
-│   ├── SETUP.md
-│   ├── API_DOCUMENTATION.md
-│   ├── DATABASE_SCHEMA.md
-│   ├── DEPLOYMENT_GUIDE.md
-│   ├── USER_MANUAL.md
-│   ├── EMAIL_TEMPLATES.md
-│   └── ARCHITECTURE.md
-│
-├── scripts/
-│   ├── init-database.sql
-│   ├── insert-students.sql
-│   ├── sample-assignments.sql
-│   └── cleanup-old-data.sql
 │
 ├── .gitignore
 ├── pom.xml

@@ -1,5 +1,6 @@
 package com.web.submission_portal.config;
 
+import com.web.submission_portal.security.CustomAuthenticationSuccessHandler;
 import com.web.submission_portal.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,8 +15,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
-    SecurityConfig(CustomUserDetailsService customUserDetailsService) {
+    private final CustomAuthenticationSuccessHandler successHandler;
+
+    SecurityConfig(CustomUserDetailsService customUserDetailsService,
+                   CustomAuthenticationSuccessHandler successHandler) {
         this.customUserDetailsService = customUserDetailsService;
+        this.successHandler = successHandler;
     }
 
     @Bean
@@ -24,20 +29,19 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth->auth
                         .requestMatchers("/css/**","/js/**","/images/**","/").permitAll()
                         .requestMatchers("/auth/**","/login","/forget-password","reset-password").permitAll()
-                        .requestMatchers("/cr/**").hasAuthority("ROLE_CR")
-                        .requestMatchers("/student/**").hasAuthority("ROLE_STUDENT")
+                        .requestMatchers("/cr/**").hasRole("CR")
+                        .requestMatchers("/student/**").hasAnyRole("STUDENT","CR")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form->form
-                        .loginPage("auth/login")
-                        .loginProcessingUrl("auth/login")
-                        .defaultSuccessUrl("/default-dashboard",true)
-                        .failureUrl("/auth/login?error=true")
+                        .loginPage("/login")
+                        .successHandler(successHandler)
+                        .failureUrl("/login?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/auth/login?logout=true")
+                        .logoutSuccessUrl("/login?logout=true")
                         .deleteCookies("JSESSIONID")
                         .invalidateHttpSession(true)
                         .permitAll()
