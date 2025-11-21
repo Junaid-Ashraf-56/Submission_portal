@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -14,34 +13,36 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    private final CustomUserDetailsService customUserDetailsService;
     private final CustomAuthenticationSuccessHandler successHandler;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    SecurityConfig(CustomUserDetailsService customUserDetailsService,
-                   CustomAuthenticationSuccessHandler successHandler) {
-        this.customUserDetailsService = customUserDetailsService;
+    SecurityConfig(CustomAuthenticationSuccessHandler successHandler,
+                   CustomUserDetailsService customUserDetailsService) {
         this.successHandler = successHandler;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+        System.out.println("Configuration");
         http
                 .authorizeHttpRequests(auth->auth
                         .requestMatchers("/css/**","/js/**","/images/**","/").permitAll()
-                        .requestMatchers("/auth/**","/login","/forget-password","reset-password").permitAll()
-                        .requestMatchers("/cr/**").hasRole("CR")
-                        .requestMatchers("/student/**").hasAnyRole("STUDENT","CR")
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/cr/**").hasAuthority("ROLE_CR")
+                        .requestMatchers("/student/**").hasAnyAuthority("ROLE_STUDENT","ROLE_CR")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form->form
-                        .loginPage("/login")
+                        .loginPage("/auth/login")
+                        .loginProcessingUrl("/auth/login")
                         .successHandler(successHandler)
-                        .failureUrl("/login?error=true")
+                        .failureUrl("/auth/login?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout=true")
+                        .logoutSuccessUrl("/auth/login?logout=true")
                         .deleteCookies("JSESSIONID")
                         .invalidateHttpSession(true)
                         .permitAll()
@@ -49,7 +50,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .maximumSessions(1)
                         .maxSessionsPreventsLogin(false)
-                );
+                )
+                .userDetailsService(customUserDetailsService);
 
         return http.build();
     }
@@ -57,10 +59,5 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return customUserDetailsService;
     }
 }

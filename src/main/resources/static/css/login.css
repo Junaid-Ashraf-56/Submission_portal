@@ -1,0 +1,30 @@
+body {
+    background-color: #f8f9fb;
+    font-family: "Inter", sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1.5rem;
+}
+
+.login-card {
+    max-width: 450px;
+    width: 100%;
+    background: white;
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,.05);
+    padding: 2.5rem;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 0.75rem;
+    font-weight: 600;
+}

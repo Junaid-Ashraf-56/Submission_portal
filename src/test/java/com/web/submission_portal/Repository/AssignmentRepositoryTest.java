@@ -34,7 +34,7 @@ public class AssignmentRepositoryTest {
                         .email("junaid@example.com")
                         .password("secret")
                         .isFirstLogin(true)
-                        .role(Role.STUDENT)
+                        .role(Role.ROLE_STUDENT)
                         .createdAt(LocalDateTime.now())
                         .build();
 
