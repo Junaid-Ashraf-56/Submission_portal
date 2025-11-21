@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CR Profile - TaskDrop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f5f7fa;
+        }
+        .card {
+            border-radius: 16px;
+        }
+        .card-header h3 {
+            font-size: 1.7rem;
+        }
+        .badge {
+            font-size: 0.9rem;
+            padding: 0.6em 1em;
+            border-radius: 10px;
+        }
+        .btn-custom {
+            background: #4a6cf7;
+            color: white;
+            padding: 10px 18px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+        .btn-custom:hover {
+            background: #3a56c8;
+        }
+        .form-control {
+            border-radius: 10px;
+            padding: 10px 14px;
+        }
+        .card-body label {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<div id="navbar-placeholder"></div>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 pt-4 pb-0 d-flex justify-content-between">
+                    <h3 class="fw-bold">CR Profile</h3>
+                    <span class="badge bg-primary align-self-center">Class Representative</span>
+                </div>
+
+                <div class="card-body p-4">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" value="Sarah Connor">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Roll Number</label>
+                            <input type="text" class="form-control" value="2024-CS-001" readonly>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Department</label>
+                            <input type="text" class="form-control" value="Computer Science" readonly>
+                        </div>
+
+                        <button type="submit" class="btn btn-custom w-100">Save Changes</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    fetch('../fragments/navbar-cr.html')
+        .then(res => res.text())
+        .then(data => document.getElementById('navbar-placeholder').innerHTML = data);
+</script>
+</body>
+</html>
