@@ -1,5 +1,6 @@
 package com.web.submission_portal.controller;
 
+
 import com.web.submission_portal.entity.Student;
 import com.web.submission_portal.entity.User;
 import com.web.submission_portal.repository.StudentRepository;
@@ -12,60 +13,58 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@RequestMapping("/student")
+@RequestMapping("/cr")
 @Controller
-
-@PreAuthorize("hasAnyAuthority('ROLE_STUDENT', 'ROLE_CR')")
-public class StudentDashboardController {
-
-    private final UserRepository userRepository;
+@PreAuthorize("hasAuthority('ROLE_CR')")
+public class CrDashboardController {
     private final StudentRepository studentRepository;
+    private final UserRepository  userRepository;
 
-    StudentDashboardController(UserRepository userRepository,
-                               StudentRepository studentRepository) {
-        this.userRepository = userRepository;
+    public CrDashboardController(StudentRepository studentRepository,
+                                 UserRepository userRepository) {
         this.studentRepository = studentRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/dashboard")
-    public String studentDashboard(Model model, Authentication authentication) {
-
+    public String crDashboard(Model model, Authentication authentication) {
         String email = authentication.getName();
+
         User user = userRepository.findByEmail(email).orElseThrow();
         Student student = studentRepository.findByUser(user).orElseThrow();
 
-        model.addAttribute("studentName", student.getName());
-        model.addAttribute("studentRollNo", student.getRollNo());
+        model.addAttribute("crName",student.getName());
 
-        return "student/dashboard";
+        return "cr/dashboard";
     }
 
-    @GetMapping("/student-profile")
-    public String studentProfile(Model model, Authentication authentication) {
+    @GetMapping("profile")
+    public String crProfile(Model model, Authentication authentication) {
         authenticateUser(model, authentication);
-        return "student/student-profile";
+        return "cr/profile";
     }
 
-    @GetMapping("/profile-info-change")
-    public String profileInfoChange(Model model, Authentication authentication) {
-        authenticateUser(model, authentication);
-        return "student/profile-info-change";
-    }
-
-    @PostMapping("/profile-info-change")
-    public String updateProfile(Student updatedStudent,Authentication authentication) {
+    @PostMapping("profile-info-change")
+    public String profileInfoChange(Student updatedStudent, Authentication authentication) {
         String email = authentication.getName();
+
         User user = userRepository.findByEmail(email).orElseThrow();
         Student student = studentRepository.findByUser(user).orElseThrow();
 
-        student.setRollNo(updatedStudent.getRollNo());
         student.setName(updatedStudent.getName());
+        student.setRollNo(updatedStudent.getRollNo());
         student.setPhoneNumber(updatedStudent.getPhoneNumber());
         student.setGender(updatedStudent.getGender());
 
         studentRepository.save(student);
 
-        return "redirect:/student/profile-info-change?updated=true";
+        return "redirect:/cr/profile?updated=true";
+    }
+
+    @GetMapping("/profile-info-change")
+    public String handleGetOnProfileChange(Model model, Authentication authentication) {
+        authenticateUser(model, authentication);
+        return "cr/profile-info-change";
     }
 
     private void authenticateUser(Model model, Authentication authentication) {
@@ -73,10 +72,10 @@ public class StudentDashboardController {
         User user = userRepository.findByEmail(email).orElseThrow();
         Student student = studentRepository.findByUser(user).orElseThrow();
 
-        model.addAttribute("studentName", student.getName());
-        model.addAttribute("studentRollNo", student.getRollNo());
-        model.addAttribute("phoneNumber", student.getPhoneNumber());
-        model.addAttribute("email", email);
-        model.addAttribute("gender", student.getGender());
+        model.addAttribute("crName",student.getName());
+        model.addAttribute("crRollNo",student.getRollNo());
+        model.addAttribute("crPhoneNumber",student.getPhoneNumber());
+        model.addAttribute("crGender",student.getGender());
+        model.addAttribute("crEmail",email);
     }
 }

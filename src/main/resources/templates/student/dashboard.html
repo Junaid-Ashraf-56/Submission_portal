@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Assignment Portal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" th:href="@{/css/navbar.css}">
-    <title>Student Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 <body class="bg-light">
 
-<!-- Navbar Fragment -->
-<div th:fragment="navbar-student" class="container">
+<!-- Navbar -->
+<div class="container">
     <nav class="navbar navbar-expand-lg navbar-dark navbar-floating">
         <div class="container-fluid">
-
             <a class="navbar-brand fw-bold fs-4 d-flex align-items-center" th:href="@{/student/dashboard}">
                 <i class="bi bi-cloud-upload-fill me-2"></i> Assignment Portal
             </a>
@@ -27,15 +29,12 @@
                         <a class="nav-link active" th:href="@{/student/dashboard}">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/student/profile}">My Profile</a>
+                        <a class="nav-link" th:href="@{/student/student-profile}">My Profile</a>
                     </li>
                 </ul>
 
                 <div class="d-flex align-items-center gap-3">
-                    <!-- Display logged-in user name -->
-                    <span class="text-white small" th:text="'Welcome, ' + ${studentName}">Welcome, Student</span>
-
-                    <!-- Logout Form -->
+                    <span class="text-white small" th:text="'Welcome, ' + ${studentName}"></span>
                     <form th:action="@{/logout}" method="POST" class="m-0">
                         <button type="submit" class="btn btn-logout px-4 py-2 btn-sm fw-bold">
                             Logout <i class="bi bi-box-arrow-right ms-1"></i>
@@ -45,6 +44,87 @@
             </div>
         </div>
     </nav>
+</div>
+
+<!-- Main Content -->
+<div class="container my-5">
+
+    <!-- Welcome Section -->
+    <div class="mb-4">
+        <h2 class="fw-bold" th:text="'Welcome back, ' + ${studentName} + '!'">Welcome back!</h2>
+        <p class="text-muted" th:text="'Roll No: ' + ${studentRollNo}">Roll No: sp24-bse-051</p>
+    </div>
+
+    <!-- Active Assignments Section -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0">
+            <i class="bi bi-journal-text me-2"></i>Active Assignments
+        </h4>
+    </div>
+
+    <!-- If No Assignments -->
+    <div th:if="${#lists.isEmpty(assignments)}" class="text-center py-5">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <h5 class="mt-3 text-muted">No Active Assignments</h5>
+        <p class="text-muted">You're all caught up! Check back later for new assignments.</p>
+    </div>
+
+    <!-- Assignment Cards Grid -->
+    <div th:unless="${#lists.isEmpty(assignments)}" class="row g-4">
+        <div th:each="assignment : ${assignments}" class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <!-- Assignment Type Badge -->
+                    <span class="badge mb-2"
+                          th:classappend="${assignment.assignmentType.name() == 'LAB'} ? 'bg-info' : 'bg-primary'"
+                          th:text="${assignment.assignmentType}">LAB</span>
+
+                    <!-- Title -->
+                    <h5 class="card-title fw-bold" th:text="${assignment.subjectTitle}">Data Structures</h5>
+                    <p class="text-muted small" th:text="${assignment.subjectCode}">CS-201</p>
+
+                    <!-- Description -->
+                    <p class="card-text small" th:text="${#strings.abbreviate(assignment.description, 80)}">
+                        Assignment description here...
+                    </p>
+
+                    <!-- Deadline -->
+                    <div class="d-flex align-items-center text-danger mb-3">
+                        <i class="bi bi-clock me-2"></i>
+                        <small th:text="'Due: ' + ${#temporals.format(assignment.endTime, 'MMM dd, yyyy HH:mm')}">
+                            Due: Oct 25, 2025 11:59 PM
+                        </small>
+                    </div>
+
+                    <!-- Submission Status -->
+                    <div th:if="${submissionStatus.get(assignment.assignmentId)}" class="mb-3">
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle me-1"></i>Submitted
+                        </span>
+                    </div>
+                    <div th:unless="${submissionStatus.get(assignment.assignmentId)}" class="mb-3">
+                        <span class="badge bg-warning text-dark">
+                            <i class="bi bi-exclamation-circle me-1"></i>Not Submitted
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Card Footer with Actions -->
+                <div class="card-footer bg-white border-0 pb-3">
+                    <a th:if="${!submissionStatus.get(assignment.assignmentId)}"
+                       th:href="@{/student/assignments/{id}/submit(id=${assignment.assignmentId})}"
+                       class="btn btn-primary w-100">
+                        <i class="bi bi-upload me-2"></i>Submit Assignment
+                    </a>
+                    <a th:if="${submissionStatus.get(assignment.assignmentId)}"
+                       th:href="@{/student/assignments/{id}/my-submission(id=${assignment.assignmentId})}"
+                       class="btn btn-outline-primary w-100">
+                        <i class="bi bi-eye me-2"></i>View Submission
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

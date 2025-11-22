@@ -1,27 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Submissions - TaskDrop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Submissions - Assignment Portal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
 </head>
-<body>
-<div id="navbar-placeholder"></div>
+<body class="bg-light">
 
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-floating">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-4" th:href="@{/cr/dashboard}">
+            <i class="bi bi-cloud-upload-fill me-2"></i> Assignment Portal
+        </a>
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge bg-primary">CR</span>
+            <form th:action="@{/logout}" method="POST" class="m-0">
+                <button type="submit" class="btn btn-logout btn-sm">Logout</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
 <div class="container my-5">
 
-    <!-- Back Button -->
-    <a href="dashboard.html" class="text-decoration-none text-muted mb-3 d-inline-block">
-        <i class="bi bi-arrow-left"></i> Back to Dashboard
+    <!-- Back Link -->
+    <a th:href="@{/cr/dashboard}" class="text-decoration-none text-muted mb-3 d-inline-block">
+        <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
     </a>
 
+    <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold">Submissions: Algorithm Analysis HW1</h3>
-        <button class="btn btn-success"><i class="bi bi-download"></i> Download All (.zip)</button>
+        <div>
+            <h3 class="fw-bold mb-1" th:text="'Submissions: ' + ${assignment.subjectTitle}">Submissions</h3>
+            <p class="text-muted mb-0" th:text="${assignment.subjectCode}">CS-201</p>
+        </div>
+        <a th:href="@{/cr/assignments/{id}/download-all(id=${assignment.assignmentId})}"
+           class="btn btn-success">
+            <i class="bi bi-download me-1"></i> Download All (.zip)
+        </a>
     </div>
 
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <h3 class="fw-bold text-primary" th:text="${totalStudents}">40</h3>
+                <small class="text-muted">Total Students</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <h3 class="fw-bold text-success" th:text="${submittedCount}">28</h3>
+                <small class="text-muted">Submitted</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <h3 class="fw-bold text-danger" th:text="${totalStudents - submittedCount}">12</h3>
+                <small class="text-muted">Pending</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <h3 class="fw-bold text-info" th:text="${#numbers.formatDecimal(submittedCount * 100.0 / totalStudents, 1, 1) + '%'}">70%</h3>
+                <small class="text-muted">Completion</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submissions Table -->
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <table class="table table-hover mb-0 align-middle">
@@ -31,40 +83,65 @@
                     <th>Roll No</th>
                     <th>Submitted At</th>
                     <th>File</th>
-                    <th>Status</th>
+                    <th>Size</th>
+                    <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td class="ps-4 fw-bold">Alice Smith</td>
-                    <td>2024-CS-101</td>
-                    <td>Nov 24, 10:00 AM</td>
-                    <td><a href="#">analysis.pdf</a></td>
-                    <td><span class="badge bg-success">On Time</span></td>
+                <!-- Submitted Students -->
+                <tr th:each="submission : ${submissions}"
+                    th:classappend="${submission.student.user.userId == currentUserId} ? 'table-info' : ''">
+                    <td class="ps-4">
+                        <span class="fw-bold" th:text="${submission.student.name}">Name</span>
+                        <span th:if="${submission.student.user.userId == currentUserId}"
+                              class="badge bg-info ms-2">You</span>
+                    </td>
+                    <td th:text="${submission.student.rollNo}">Roll No</td>
+                    <td th:text="${#temporals.format(submission.submittedAt, 'MMM dd, hh:mm a')}">Time</td>
+                    <td>
+                        <i class="bi bi-file-earmark-pdf text-danger me-1"></i>
+                        <span th:text="${submission.fileName}">file.pdf</span>
+                    </td>
+                    <td th:text="${#numbers.formatDecimal(submission.fileSize / 1024.0, 1, 1) + ' KB'}">250 KB</td>
+                    <td>
+                        <a th:href="@{/cr/submissions/{id}/download(id=${submission.submissionId})}"
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-download"></i>
+                        </a>
+                    </td>
                 </tr>
-                <tr>
-                    <td class="ps-4 fw-bold">Bob Johnson</td>
-                    <td>2024-CS-102</td>
-                    <td>Nov 25, 11:55 PM</td>
-                    <td><a href="#">report.pdf</a></td>
-                    <td><span class="badge bg-warning text-dark">Late</span></td>
-                </tr>
-                <tr>
-                    <td class="ps-4 fw-bold text-muted">Charlie Brown</td>
-                    <td>2024-CS-103</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td><span class="badge bg-danger">Missing</span></td>
+
+                <!-- No Submissions Message -->
+                <tr th:if="${#lists.isEmpty(submissions)}">
+                    <td colspan="6" class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox display-6 d-block mb-2"></i>
+                        No submissions yet
+                    </td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
+
+    <!-- Not Submitted List -->
+    <div th:if="${!#lists.isEmpty(notSubmittedStudents)}" class="mt-4">
+        <h5 class="fw-bold text-danger">
+            <i class="bi bi-exclamation-triangle me-2"></i>Not Submitted (<span th:text="${#lists.size(notSubmittedStudents)}">12</span>)
+        </h5>
+        <div class="card border-danger">
+            <div class="card-body">
+                <div class="row">
+                    <div th:each="student : ${notSubmittedStudents}" class="col-md-4 col-lg-3 mb-2">
+                        <span class="badge bg-light text-dark border" th:text="${student.rollNo + ' - ' + student.name}">
+                            sp24-bse-051 - Name
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    fetch('../fragments/navbar-cr.html').then(res => res.text()).then(data => document.getElementById('navbar-placeholder').innerHTML = data);
-</script>
 </body>
 </html>
