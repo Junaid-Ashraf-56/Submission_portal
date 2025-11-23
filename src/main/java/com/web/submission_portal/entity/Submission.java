@@ -39,7 +39,7 @@ public class Submission {
     private Long fileSize;
 
     @Column(length = 500)
-    private String filePath; // Optional: for future S3/cloud storage
+    private String filePath;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime submittedAt;

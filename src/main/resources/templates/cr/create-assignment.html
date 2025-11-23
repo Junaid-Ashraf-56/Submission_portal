@@ -46,66 +46,80 @@
                     <span th:text="${error}">Error</span>
                 </div>
 
-                <form th:action="@{/cr/assignments}" method="POST">
+                <form th:action="@{/cr/create-assignment}" method="POST">
 
                     <!-- Subject Code -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">Subject Code *</label>
-                        <input type="text"
-                               name="subjectCode"
-                               class="form-control"
-                               placeholder="e.g. CS-201"
-                               required>
+                        <label>
+                            <input type="text"
+                                   name="subjectCode"
+                                   class="form-control"
+                                   placeholder="e.g. CS-201"
+                                   required>
+                        </label>
                     </div>
 
                     <!-- Subject Title -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">Subject Title *</label>
-                        <input type="text"
-                               name="subjectTitle"
-                               class="form-control"
-                               placeholder="e.g. Data Structures - Assignment 1"
-                               required>
+                        <label>
+                            <input type="text"
+                                   name="subjectTitle"
+                                   class="form-control"
+                                   placeholder="e.g. Data Structures - Assignment 1"
+                                   required>
+                        </label>
                     </div>
 
                     <div class="row">
                         <!-- Assignment Type -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Assignment Type *</label>
-                            <select name="assignmentType" class="form-select" required>
-                                <option value="">Select Type</option>
-                                <option value="LAB">LAB</option>
-                                <option value="THEORY">THEORY</option>
-                            </select>
+                            <label>
+                                <select name="assignmentType" class="form-select" required>
+                                    <option value="">Select Type</option>
+                                    <option value="LAB">LAB</option>
+                                    <option value="THEORY">THEORY</option>
+                                </select>
+                            </label>
                         </div>
 
                         <!-- Start Time -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Portal Opens (Start Time) *</label>
-                            <input type="datetime-local"
-                                   name="startTime"
-                                   class="form-control"
-                                   required>
+                            <label>
+                                <input type="datetime-local"
+                                       name="startTime"
+                                       class="form-control"
+                                       required>
+                            </label>
                         </div>
                     </div>
 
                     <!-- End Time (Deadline) -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">Deadline (End Time) *</label>
-                        <input type="datetime-local"
-                               name="endTime"
-                               class="form-control"
-                               required>
+                        <label>
+                            <input type="datetime-local"
+                                   name="endTime"
+                                   class="form-control"
+                                   required>
+                        </label>
                         <small class="text-muted">Students cannot submit after this time</small>
                     </div>
 
                     <!-- Description -->
                     <div class="mb-4">
                         <label class="form-label fw-bold">Instructions / Description</label>
-                        <textarea name="description"
-                                  class="form-control"
-                                  rows="4"
-                                  placeholder="Enter assignment instructions..."></textarea>
+                        <label>
+                                <textarea name="description"
+                                          class="form-control"
+                                          rows="4"
+                                          placeholder="Enter assignment instructions...">
+
+                                </textarea>
+                        </label>
                     </div>
 
                     <!-- Buttons -->
