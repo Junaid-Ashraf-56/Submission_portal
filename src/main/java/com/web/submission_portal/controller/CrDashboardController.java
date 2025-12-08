@@ -17,9 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @RequestMapping("/cr")
@@ -49,23 +47,13 @@ public class CrDashboardController {
     public String crDashboard(Model model, Authentication authentication) {
         String email = authentication.getName();
 
-        //These all fot user
+        //These all for user
         User user = userRepository.findByEmail(email).orElseThrow();
         Student student = studentRepository.findByUser(user).orElseThrow();
         model.addAttribute("crName",student.getName());
 
         //These for the assignment which will created by th cr
-        List<Assignment> createdAssignments = assignmentService.getAssignmentsByCreator(user);
-        Map<Long,Long> submissionCounts = new HashMap<>();
-        for(Assignment assignment : createdAssignments){
-            long count = submissionRepository.countByAssignment(assignment);
-            submissionCounts.put(assignment.getAssignmentId(), count);
-        }
-        long totalStudents = studentRepository.count();
-        model.addAttribute("createdAssignments", createdAssignments);
-        model.addAttribute("submissionCounts", submissionCounts);
-        model.addAttribute("totalStudents", totalStudents);
-        model.addAttribute("crName",student.getName());
+        CrAssignmentController.submissionDetails(model, user, student, assignmentService, submissionRepository, studentRepository);
 
         //These for the assignment submitted by the cr as student
         List<Assignment> assignments = assignmentRepository.findAll();

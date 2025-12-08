@@ -4,83 +4,205 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit Assignment - Assignment Portal</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
 </head>
-<body class="bg-light">
+<body>
 
-<!-- Navbar (same as dashboard) -->
+<!-- Navbar -->
 <div class="container">
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-floating">
+    <nav class="navbar navbar-expand-lg navbar-floating">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold fs-4" th:href="@{/student/dashboard}">
+            <a class="navbar-brand" th:href="@{/student/dashboard}">
                 <i class="bi bi-cloud-upload-fill me-2"></i> Assignment Portal
             </a>
-            <div class="d-flex align-items-center gap-3">
-                <span class="text-white small" th:text="'Welcome, ' + ${studentName}">Welcome</span>
-                <form th:action="@{/logout}" method="POST" class="m-0">
-                    <button type="submit" class="btn btn-logout btn-sm">Logout</button>
-                </form>
+
+            <button class="navbar-toggler border-0 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-2">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/student/dashboard}">
+                            <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/student/student-profile}">
+                            <i class="bi bi-person me-1"></i>Profile
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-white fw-semibold" th:text="${studentName}">Student</span>
+                    <form th:action="@{/logout}" method="POST" class="m-0">
+                        <button type="submit" class="btn btn-logout">
+                            <i class="bi bi-box-arrow-right me-1"></i>Logout
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </nav>
 </div>
 
 <!-- Main Content -->
-<div class="container my-5 d-flex justify-content-center">
-    <div class="card shadow-lg border-0 p-4" style="max-width: 600px; width: 100%;">
+<div class="container my-5">
 
-        <!-- Back Link -->
-        <a th:href="@{/student/dashboard}" class="text-decoration-none text-muted mb-3">
-            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+    <!-- Page Header -->
+    <div class="mb-4 animate-fadeIn">
+        <a th:href="@{/student/dashboard}" class="text-decoration-none text-muted d-inline-flex align-items-center mb-3">
+            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
         </a>
+        <h1 class="fw-bold text-gradient mb-2">Submit Assignment</h1>
+        <p class="text-muted fs-5">Upload your assignment file</p>
+    </div>
 
-        <!-- Assignment Info -->
-        <h3 class="text-center mb-2" th:text="${assignment.subjectTitle}">Data Structures</h3>
-        <p class="text-center text-muted" th:text="${assignment.subjectCode}">CS-201</p>
+    <!-- Submit Form Card -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card assignment-card animate-scaleIn">
+                <div class="card-body p-4">
 
-        <!-- Deadline Warning -->
-        <div class="alert alert-warning text-center">
-            <i class="bi bi-clock me-2"></i>
-            <strong>Deadline:</strong>
-            <span th:text="${#temporals.format(assignment.endTime, 'MMM dd, yyyy HH:mm')}">Oct 25, 2025</span>
-        </div>
+                    <!-- Assignment Info -->
+                    <div class="text-center mb-4 pb-4 border-bottom">
+                        <div class="d-inline-flex align-items-center gap-2 mb-3">
+                            <span class="badge"
+                                  th:classappend="${assignment.assignmentType.name() == 'LAB'} ? 'bg-info' : 'bg-primary'"
+                                  th:text="${assignment.assignmentType}">LAB</span>
+                        </div>
+                        <h3 class="fw-bold mb-1" th:text="${assignment.subjectTitle}">Data Structures</h3>
+                        <p class="text-muted mb-0" th:text="${assignment.subjectCode}">CS-201</p>
+                    </div>
 
-        <!-- Error Message -->
-        <div th:if="${error}" class="alert alert-danger">
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            <span th:text="${error}">Error message</span>
-        </div>
+                    <!-- Deadline Warning -->
+                    <div class="alert alert-warning border-0 mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-clock-fill me-3 fs-4"></i>
+                            <div>
+                                <strong>Submission Deadline</strong>
+                                <div class="small" th:text="${#temporals.format(assignment.endTime, 'MMM dd, yyyy HH:mm')}">
+                                    Oct 25, 2025 23:59
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- Upload Form -->
-        <form th:action="@{/student/assignments/{id}/submit(id=${assignment.assignmentId})}"
-              method="POST"
-              enctype="multipart/form-data">
+                    <!-- Error Message -->
+                    <div th:if="${error}" class="alert alert-danger border-0 animate-slideInLeft mb-4">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <span th:text="${error}">Error message</span>
+                    </div>
 
-            <div class="mb-4 border rounded p-5 text-center bg-light" style="border-style: dashed !important;">
-                <i class="bi bi-cloud-upload display-4 text-primary"></i>
-                <p class="mt-2 mb-3">Drag & Drop your file here or click to browse</p>
-                <input type="file"
-                       name="file"
-                       class="form-control"
-                       accept=".pdf,.doc,.docx,.xls,.xlsx"
-                       required>
-                <small class="text-muted mt-2 d-block">
-                    Allowed: PDF, DOC, DOCX, XLS, XLSX (Max 10MB)
+                    <!-- Upload Form -->
+                    <form th:action="@{/student/submit/{id}/submit(id=${assignment.assignmentId})}"
+                          method="POST"
+                          enctype="multipart/form-data">
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold mb-3">
+                                <i class="bi bi-file-earmark-arrow-up me-2 text-primary"></i>
+                                Upload Your File
+                            </label>
+
+                            <div class="border rounded p-5 text-center bg-light position-relative"
+                                 style="border-style: dashed !important; border-width: 2px !important; transition: all 0.3s;">
+                                <i class="bi bi-cloud-upload display-3 text-primary mb-3"></i>
+                                <h5 class="fw-semibold mb-2">Drop your file here</h5>
+                                <p class="text-muted mb-3">or click to browse from your device</p>
+
+                                <input type="file"
+                                       name="file"
+                                       class="form-control form-control-lg"
+                                       accept=".pdf,.doc,.docx,.xls,.xlsx"
+                                       required
+                                       style="cursor: pointer;">
+
+                                <div class="mt-3 p-3 bg-white rounded">
+                                    <small class="text-muted d-block">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        <strong>Accepted formats:</strong> PDF, DOC, DOCX, XLS, XLSX
+                                    </small>
+                                    <small class="text-muted d-block mt-1">
+                                        <i class="bi bi-hdd me-1"></i>
+                                        <strong>Maximum size:</strong> 10 MB
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-3 mt-4">
+                            <button type="submit" class="btn btn-primary flex-fill">
+                                <i class="bi bi-upload me-2"></i>Upload & Submit
+                            </button>
+                            <a th:href="@{/student/dashboard}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+            <!-- Help Text -->
+            <div class="text-center mt-4 animate-fadeIn">
+                <small class="text-muted">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Your submission will be timestamped and securely stored
                 </small>
             </div>
-
-            <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary btn-lg">
-                    <i class="bi bi-upload me-2"></i>Upload & Submit
-                </button>
-                <a th:href="@{/student/dashboard}" class="btn btn-light">Cancel</a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Trigger animations on load
+    document.addEventListener('DOMContentLoaded', () => {
+        const card = document.querySelector('.card');
+        if (card) {
+            card.style.opacity = '0';
+            card.style.animation = 'scaleIn 0.6s ease forwards';
+        }
+
+        // File input interaction
+        const fileInput = document.querySelector('input[type="file"]');
+        const dropZone = fileInput.closest('.border');
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const fileName = e.target.files[0].name;
+                const fileSize = (e.target.files[0].size / 1024 / 1024).toFixed(2);
+                dropZone.style.borderColor = '#0d6efd';
+                dropZone.style.backgroundColor = '#e7f3ff';
+            }
+        });
+
+        // Drag and drop styling
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#0d6efd';
+            dropZone.style.backgroundColor = '#e7f3ff';
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = '';
+            dropZone.style.backgroundColor = '';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '';
+            dropZone.style.backgroundColor = '';
+        });
+    });
+</script>
 </body>
 </html>

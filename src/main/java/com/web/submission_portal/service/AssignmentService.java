@@ -26,4 +26,9 @@ public class AssignmentService {
     public List<Assignment> getAssignmentsByCreator(User user) {
         return assignmentRepository.findByCreatedBy(user);
     }
+
+    public String getAssignmentSubjectCode (Assignment assignment){
+        return assignment.getSubjectCode();
+    }
+
 }

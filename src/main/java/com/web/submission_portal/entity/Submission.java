@@ -30,11 +30,6 @@ public class Submission {
     @Column(nullable = false)
     private String fileName;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "file_data", columnDefinition = "BYTEA")
-    private byte[] fileData;
-
     @Column(nullable = false)
     private Long fileSize;
 
