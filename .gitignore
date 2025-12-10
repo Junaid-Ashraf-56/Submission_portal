@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+#Supbase
+application.properties
+.env
+*.env
