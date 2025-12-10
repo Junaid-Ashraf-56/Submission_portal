@@ -94,14 +94,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!--        Firebase -->
-        <!-- https://mvnrepository.com/artifact/com.google.firebase/firebase-admin -->
-        <dependency>
-            <groupId>com.google.firebase</groupId>
-            <artifactId>firebase-admin</artifactId>
-            <version>9.7.0</version>
-        </dependency>
-
     </dependencies>
 
 	<build>

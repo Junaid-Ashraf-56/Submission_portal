@@ -16,7 +16,7 @@ public class AuthController {
 
     @GetMapping("/forgot-password")
     public String showForgotPasswordForm() {
-        return "auth/forgot-password"; // Corresponds to templates/auth/forgot-password.html
+        return "auth/ forgot-password";
     }
 
     /**
