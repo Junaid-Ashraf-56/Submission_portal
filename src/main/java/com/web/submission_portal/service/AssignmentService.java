@@ -31,4 +31,7 @@ public class AssignmentService {
         return assignment.getSubjectCode();
     }
 
+    public Assignment findById(long assignmentId){
+        return assignmentRepository.findFirstByAssignmentId(assignmentId);
+    }
 }

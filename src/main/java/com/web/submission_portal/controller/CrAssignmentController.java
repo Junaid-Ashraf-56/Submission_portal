@@ -145,17 +145,22 @@ public class CrAssignmentController {
                                   StudentRepository studentRepository) {
 
         List<Assignment> assignment = assignmentService.getAssignmentsByCreator(user);
-        Map<String,Long> submissionCount = new HashMap<>();
+
+        // CHANGE 1: Use Long for the key (Assignment ID), not String
+        Map<Long, Long> submissionCount = new HashMap<>();
+
         for (Assignment a : assignment) {
             long count = submissionRepository.countByAssignment(a);
-            submissionCount.put(student.getRollNo(), count);
+
+            // CHANGE 2: Use the Assignment ID as the key
+            submissionCount.put(a.getAssignmentId(), count);
         }
 
         long totalStudents = studentRepository.count();
         model.addAttribute("createdAssignments", assignment);
         model.addAttribute("submissionCounts", submissionCount);
         model.addAttribute("totalStudents", totalStudents);
-        model.addAttribute("crName",student.getName());
+        model.addAttribute("crName", student.getName());
     }
 
 

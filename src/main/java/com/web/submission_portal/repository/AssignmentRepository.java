@@ -12,9 +12,8 @@ import java.util.Optional;
 @Repository
 public interface AssignmentRepository extends JpaRepository<Assignment,Long> {
     Optional<Assignment> findByAssignmentId(Long assignmentId);
-    List<Assignment> findBySubjectCode(String subject_code);
+
+    Assignment findFirstByAssignmentId(Long assignmentId);
+
     List<Assignment> findByCreatedBy(User user);
-    List<Assignment> findByStartTimeBeforeAndEndTimeAfter(LocalDateTime now1, LocalDateTime now2);
-    List<Assignment> findByEndTimeBetween(LocalDateTime start, LocalDateTime end);
-    boolean existsBySubjectCode(String subjectCode);
 }

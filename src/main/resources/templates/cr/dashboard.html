@@ -13,7 +13,6 @@
 </head>
 <body>
 
-<!-- Navbar -->
 <div class="container">
     <nav class="navbar navbar-expand-lg navbar-floating">
         <div class="container-fluid">
@@ -53,10 +52,8 @@
     </nav>
 </div>
 
-<!-- Main Content -->
 <div class="container my-5">
 
-    <!-- Welcome Section -->
     <div class="mb-5 animate-fadeIn">
         <h1 class="fw-bold text-gradient mb-2">Welcome back, <span th:text="${crName}">CR</span>!</h1>
         <p class="text-muted fs-5">
@@ -65,7 +62,6 @@
         </p>
     </div>
 
-    <!-- Section 1: My Tasks (CR as Student) -->
     <div class="mb-5">
         <div class="d-flex justify-content-between align-items-center mb-4 animate-slideInLeft">
             <h3 class="fw-bold mb-0">
@@ -74,7 +70,6 @@
             <span class="badge bg-info" th:text="${#lists.size(assignments)} + ' Active'">0 Active</span>
         </div>
 
-        <!-- Empty State -->
         <div th:if="${#lists.isEmpty(assignments)}" class="text-center py-5 animate-scaleIn">
             <div class="mb-4">
                 <i class="bi bi-check-circle display-1 text-muted" style="opacity: 0.3;"></i>
@@ -83,25 +78,24 @@
             <p class="text-muted">You have no pending assignments to submit.</p>
         </div>
 
-        <!-- Assignment Cards -->
         <div th:unless="${#lists.isEmpty(assignments)}" class="row g-4">
             <div th:each="assignment : ${assignments}" class="col-md-6 col-lg-4">
                 <div class="card assignment-card h-100 animate-fadeIn hover-lift">
                     <div class="card-body">
-                        <!-- Type & Status Row -->
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="badge"
+                                  th:if="${assignment.assignmentType != null}"
                                   th:classappend="${assignment.assignmentType.name() == 'LAB'} ? 'bg-info' : 'bg-primary'"
                                   th:text="${assignment.assignmentType}">LAB</span>
+
+                            <span th:if="${assignment.assignmentType == null}" class="badge bg-secondary">Unknown</span>
                             <span class="badge"
                                   th:classappend="${assignment.endTime.isAfter(T(java.time.LocalDateTime).now())} ? 'bg-success' : 'bg-secondary'"
                                   th:text="${assignment.endTime.isAfter(T(java.time.LocalDateTime).now())} ? 'Active' : 'Closed'">Active</span>
                         </div>
 
-                        <!-- Title -->
                         <h5 class="card-title fw-bold mb-3" th:text="${assignment.subjectTitle}">Subject</h5>
 
-                        <!-- Deadline -->
                         <div class="d-flex align-items-center text-muted small">
                             <i class="bi bi-clock me-2"></i>
                             <span th:text="'Due: ' + ${#temporals.format(assignment.endTime, 'MMM dd, HH:mm')}">Due</span>
@@ -120,7 +114,6 @@
 
     <hr class="my-5">
 
-    <!-- Section 2: Manage Assignments (CR Functions) -->
     <div class="d-flex justify-content-between align-items-center mb-4 animate-slideInLeft">
         <h3 class="fw-bold mb-0">
             <i class="bi bi-journal-text me-2 text-primary"></i>Manage Assignments
@@ -130,7 +123,6 @@
         </a>
     </div>
 
-    <!-- Empty State -->
     <div th:if="${#lists.isEmpty(createdAssignments)}" class="text-center py-5 animate-scaleIn">
         <div class="mb-4">
             <i class="bi bi-inbox display-1 text-muted" style="opacity: 0.3;"></i>
@@ -139,12 +131,10 @@
         <p class="text-muted">Click "New Assignment" to create your first assignment.</p>
     </div>
 
-    <!-- Assignment Cards Grid -->
     <div th:unless="${#lists.isEmpty(createdAssignments)}" class="row g-4">
         <div th:each="assignment : ${createdAssignments}" class="col-md-6 col-lg-4">
             <div class="card assignment-card h-100 animate-fadeIn hover-lift">
                 <div class="card-body">
-                    <!-- Status & Deadline Row -->
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <span class="badge"
                               th:classappend="${assignment.endTime.isAfter(T(java.time.LocalDateTime).now())} ? 'bg-success' : 'bg-secondary'"
@@ -155,11 +145,9 @@
                         </small>
                     </div>
 
-                    <!-- Title & Code -->
                     <h5 class="card-title fw-bold mb-1" th:text="${assignment.subjectTitle}">Title</h5>
                     <p class="text-muted small mb-3" th:text="${assignment.subjectCode}">Code</p>
 
-                    <!-- Submission Progress -->
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <small class="text-muted fw-semibold">
@@ -178,7 +166,6 @@
                         </div>
                     </div>
 
-                    <!-- Action Buttons -->
                     <div class="d-flex gap-2">
                         <a th:href="@{/cr/assignments/{id}/submissions(id=${assignment.assignmentId})}"
                            class="btn btn-sm btn-outline-primary flex-fill"
@@ -190,11 +177,14 @@
                            title="Extend Deadline">
                             <i class="bi bi-calendar-plus me-1"></i>Extend
                         </a>
+
                         <a th:href="@{/cr/assignments/{id}/download-all(id=${assignment.assignmentId})}"
+                           th:classappend="${submissionCounts.get(assignment.assignmentId) == null || submissionCounts.get(assignment.assignmentId) == 0 ? 'disabled' : ''}"
                            class="btn btn-sm btn-success"
-                           title="Download All">
+                           title="Download All Submissions">
                             <i class="bi bi-download"></i>
                         </a>
+
                     </div>
                 </div>
             </div>
@@ -204,7 +194,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Trigger animations on load
+    // Simple animation on load
     document.addEventListener('DOMContentLoaded', () => {
         const cards = document.querySelectorAll('.card');
         cards.forEach((card, index) => {
