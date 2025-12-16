@@ -18,7 +18,6 @@ public class AuthController {
     private final PasswordResetService passwordResetService;
     private final OTPValidationService otpValidationService;
 
-    // ==================== FORGOT PASSWORD ====================
 
     @GetMapping("/forgot-password")
     public String showForgotPasswordPage() {
@@ -34,7 +33,6 @@ public class AuthController {
         try {
             log.info("Processing forgot password for email: {}", email);
 
-            // This will delete all old OTPs and send a new one
             passwordResetService.sendOTP(email);
 
             session.setAttribute("resetEmail", email);
@@ -51,7 +49,6 @@ public class AuthController {
         }
     }
 
-    // ==================== VERIFY OTP ====================
 
     @GetMapping("/verify-otp")
     public String showVerifyOtpPage(HttpSession session, RedirectAttributes redirectAttributes) {
@@ -89,7 +86,6 @@ public class AuthController {
 
             log.info("Verifying OTP for email: {}", email);
 
-            // Comprehensive validation
             OTPValidationService.OTPValidationResult result =
                     otpValidationService.validateOTP(email, otp);
 
@@ -97,7 +93,6 @@ public class AuthController {
                 throw new RuntimeException(result.message());
             }
 
-            // Additional session-based time check
             Long otpSentTime = (Long) session.getAttribute("otpSentTime");
             if (otpSentTime != null) {
                 long elapsedSeconds = (System.currentTimeMillis() - otpSentTime) / 1000;
@@ -108,7 +103,6 @@ public class AuthController {
                 }
             }
 
-            // ← FIXED: Store OTP in session, DON'T mark it as used yet
             session.setAttribute("verifiedOTP", otp);
             log.info("OTP verified successfully for: {}", email);
 
@@ -131,10 +125,8 @@ public class AuthController {
                 return "error:Session expired";
             }
 
-            // This will delete old OTPs and send new one
             passwordResetService.sendOTP(email);
 
-            // Update sent time
             session.setAttribute("otpSentTime", System.currentTimeMillis());
 
             log.info("OTP resent successfully to: {}", email);
@@ -146,7 +138,6 @@ public class AuthController {
         }
     }
 
-    // ==================== RESET PASSWORD ====================
 
     @GetMapping("/reset-password")
     public String showResetPasswordPage(HttpSession session, RedirectAttributes redirectAttributes) {
@@ -187,10 +178,8 @@ public class AuthController {
 
             log.info("Resetting password for email: {}", email);
 
-            // This will mark OTP as used and update password
             passwordResetService.resetPassword(email, otp, newPassword);
 
-            // Clear session
             session.removeAttribute("resetEmail");
             session.removeAttribute("verifiedOTP");
             session.removeAttribute("otpSentTime");
@@ -206,8 +195,6 @@ public class AuthController {
             return "redirect:/auth/reset-password?error";
         }
     }
-
-    // ==================== LOGIN ====================
 
     @GetMapping("/login")
     public String showLoginPage() {

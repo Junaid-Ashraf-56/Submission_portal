@@ -139,7 +139,6 @@ public class CrAssignmentController {
 
         List<Assignment> assignment = assignmentService.getAssignmentsByCreator(user);
 
-        // Use Long for the key (Assignment ID), not String
         Map<Long, Long> submissionCount = new HashMap<>();
 
         for (Assignment a : assignment) {

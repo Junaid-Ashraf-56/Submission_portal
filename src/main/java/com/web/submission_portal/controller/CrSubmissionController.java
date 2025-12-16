@@ -46,10 +46,6 @@ public class CrSubmissionController {
         this.storageService = storageService;
     }
 
-    /**
-     * Show submission page for CR
-     * GET /cr/assignments/{id}/submit
-     */
     @GetMapping("/assignments/{id}/submit")
     public String showSubmissionPage(@PathVariable("id") Long assignmentId,
                                      Model model,
@@ -65,7 +61,6 @@ public class CrSubmissionController {
             model.addAttribute("assignment", assignment);
             model.addAttribute("studentName", student.getName());
 
-            // Returns the template at: src/main/resources/templates/cr/submit-assignment.html
             return "cr/submit-assignment";
         } catch (Exception e) {
             log.error("Error loading submission page: {}", e.getMessage());
@@ -73,10 +68,7 @@ public class CrSubmissionController {
         }
     }
 
-    /**
-     * Handle CR assignment submission
-     * POST /cr/assignments/{id}/submit
-     */
+
     @PostMapping("/assignments/{id}/submit")
     public String submitAssignmentAsCr(@PathVariable("id") Long assignmentId,
                                        @RequestParam("file") MultipartFile file,
@@ -175,7 +167,6 @@ public class CrSubmissionController {
                 redirectAttributes.addFlashAttribute("success", "Assignment submitted successfully!");
             }
 
-            // Redirect to CR dashboard
             return "redirect:/cr/dashboard";
 
         } catch (Exception e) {
@@ -185,9 +176,7 @@ public class CrSubmissionController {
         }
     }
 
-    /**
-     * Check if file type is allowed
-     */
+
     private boolean isAllowedFileType(String contentType) {
         return contentType.equals("application/pdf") ||
                 contentType.equals("application/msword") ||

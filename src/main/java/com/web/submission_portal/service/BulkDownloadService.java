@@ -27,21 +27,18 @@ public class BulkDownloadService {
             throw new IOException("No submissions found");
         }
 
-        // Create ZIP
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (ZipOutputStream zos = new ZipOutputStream(baos)) {
 
             for (Submission submission : submissions) {
                 try {
-                    // Download file from Supabase
+
                     byte[] fileData = StorageService.downloadFile(submission.getFilePath());
 
-                    // Create folder: StudentName_ID/filename
                     String folder = submission.getStudent().getName() + "_" +
                             submission.getStudent().getStudentId();
                     String zipPath = folder + "/" + submission.getOriginalFileName();
 
-                    // Add to ZIP
                     ZipEntry zipEntry = new ZipEntry(zipPath);
                     zos.putNextEntry(zipEntry);
                     zos.write(fileData);

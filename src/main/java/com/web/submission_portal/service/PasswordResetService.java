@@ -29,10 +29,6 @@ public class PasswordResetService {
     @Value("${otp.expiry.minutes:1}")
     private int otpExpiryMinutes;
 
-    /**
-     * Step 1: Generate OTP and send to user's email
-     * FIXED: Now deletes ALL old tokens for this user before creating new one
-     */
     @Transactional
     public void sendOTP(String email) {
         log.info("OTP request for email: {}", email);
@@ -65,49 +61,6 @@ public class PasswordResetService {
         }
     }
 
-    /**
-     * Step 2: Verify OTP entered by user
-     * This is now ONLY used for verification, not for password reset
-     */
-    public boolean verifyOTP(String email, String otp) {
-        log.info("Verifying OTP for email: {}", email);
-
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isEmpty()) {
-            log.warn("User not found: {}", email);
-            return false;
-        }
-
-        User user = userOpt.get();
-
-        Optional<PasswordResetToken> tokenOpt = tokenRepository
-                .findByOtpAndUserUserId(otp, user.getUserId());
-
-        if (tokenOpt.isEmpty()) {
-            log.warn("Invalid OTP for user: {}", email);
-            return false;
-        }
-
-        PasswordResetToken token = tokenOpt.get();
-
-        if (token.getUsed()) {
-            log.warn("OTP already used for user: {}", email);
-            return false;
-        }
-
-        if (token.getExpiryTime().isBefore(LocalDateTime.now())) {
-            log.warn("OTP expired for user: {}", email);
-            return false;
-        }
-
-        log.info("OTP verified successfully for user: {}", email);
-        return true;
-    }
-
-    /**
-     * Step 3: Reset password after OTP verification
-     * FIXED: Removed the verifyOTP call since we already verified in the controller
-     */
     @Transactional
     public void resetPassword(String email, String otp, String newPassword) {
         log.info("Password reset request for email: {}", email);
@@ -150,28 +103,7 @@ public class PasswordResetService {
         log.info("Password reset successful for user: {}", email);
     }
 
-    /**
-     * Check if user has valid unused OTP
-     */
-    public boolean hasValidOTP(String email) {
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isEmpty()) {
-            return false;
-        }
 
-        User user = userOpt.get();
-        Optional<PasswordResetToken> tokenOpt = tokenRepository
-                .findByUserUserIdAndUsedFalseAndExpiryTimeAfter(
-                        user.getUserId(),
-                        LocalDateTime.now()
-                );
-
-        return tokenOpt.isPresent();
-    }
-
-    /**
-     * ← FIXED: Delete ALL tokens (used and unused) for a specific user
-     */
     @Transactional
     public void deleteAllTokensForUser(Long userId) {
         List<PasswordResetToken> tokens = tokenRepository.findAllByUserUserId(userId);
@@ -179,24 +111,5 @@ public class PasswordResetService {
             tokenRepository.deleteAll(tokens);
             log.info("Deleted {} old tokens for user ID: {}", tokens.size(), userId);
         }
-    }
-
-    /**
-     * Scheduled cleanup of expired tokens
-     */
-    @Transactional
-    public void cleanupExpiredTokens() {
-        LocalDateTime cutoffTime = LocalDateTime.now();
-        tokenRepository.deleteByExpiryTimeBefore(cutoffTime);
-        log.info("Cleaned up expired tokens");
-    }
-
-    /**
-     * Scheduled cleanup of used tokens
-     */
-    @Transactional
-    public void cleanupUsedTokens() {
-        tokenRepository.deleteByUsedTrue();
-        log.info("Cleaned up used tokens");
     }
 }

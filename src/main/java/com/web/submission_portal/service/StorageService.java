@@ -15,10 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Simple Supabase Storage Service
- * Uses only Java standard library - NO external dependencies needed!
- */
+
 @Service
 @Slf4j
 public class StorageService {
@@ -32,22 +29,17 @@ public class StorageService {
     @Value("${supabase.bucket.name}")
     private String bucketName;
 
-    /**
-     * Upload file to Supabase
-     */
+
     public Map<String, String> uploadFile(MultipartFile file, Long assignmentId, Long studentId) throws IOException {
-        // Generate unique filename
+
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
         String originalFileName = file.getOriginalFilename();
         String storedFileName = timestamp + "_" + sanitizeFileName(originalFileName);
 
-        // Create file path
         String filePath = String.format("assignments/%d/%d/%s", assignmentId, studentId, storedFileName);
 
-        // Upload to Supabase
         String fileUrl = uploadToSupabase(file.getBytes(), filePath, file.getContentType());
 
-        // Return file info
         Map<String, String> fileInfo = new HashMap<>();
         fileInfo.put("fileUrl", fileUrl);
         fileInfo.put("filePath", filePath);
@@ -60,9 +52,6 @@ public class StorageService {
         return fileInfo;
     }
 
-    /**
-     * Download file from Supabase
-     */
     public byte[] downloadFile(String filePath) throws IOException {
         String downloadUrl = String.format("%s/storage/v1/object/%s/%s",
                 supabaseUrl, bucketName, encodeUrlPath(filePath));
@@ -104,9 +93,6 @@ public class StorageService {
         }
     }
 
-    /**
-     * Upload bytes to Supabase Storage
-     */
     private String uploadToSupabase(byte[] fileData, String filePath, String contentType) throws IOException {
         String uploadUrl = String.format("%s/storage/v1/object/%s/%s",
                 supabaseUrl, bucketName, encodeUrlPath(filePath));
@@ -150,9 +136,7 @@ public class StorageService {
         }
     }
 
-    /**
-     * Delete file from Supabase
-     */
+
     public boolean deleteFile(String filePath) {
         try {
             String deleteUrl = String.format("%s/storage/v1/object/%s/%s",

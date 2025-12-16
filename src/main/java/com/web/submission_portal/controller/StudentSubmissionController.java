@@ -51,10 +51,7 @@ public class StudentSubmissionController {
         this.storageService = storageService;
     }
 
-    /**
-     * Handle student assignment submission
-     * POST /student/submit/{id}/submit
-     */
+
     @PostMapping("/submit/{id}/submit")
     public String submitAssignment(@PathVariable("id") Long assignmentId,
                                    @RequestParam("file") MultipartFile file,
@@ -169,10 +166,7 @@ public class StudentSubmissionController {
         }
     }
 
-    /**
-     * View student's own submission
-     * GET /student/assignments/{id}/my-submission
-     */
+
     @GetMapping("/assignments/{id}/my-submission")
     public String viewMySubmission(@PathVariable("id") Long assignmentId,
                                    Authentication authentication,
@@ -200,10 +194,7 @@ public class StudentSubmissionController {
         }
     }
 
-    /**
-     * Download student's own submission file
-     * GET /student/submissions/{id}/download
-     */
+
     @GetMapping("/submissions/{id}/download")
     public ResponseEntity<Resource> downloadSubmission(@PathVariable("id") Long submissionId,
                                                        Authentication authentication) {
@@ -215,18 +206,16 @@ public class StudentSubmissionController {
             Submission submission = submissionRepository.findById(submissionId)
                     .orElseThrow(() -> new ResourceNotFoundException("Submission not found"));
 
-            // Verify ownership - student can only download their own submission
             if (!submission.getStudent().getStudentId().equals(student.getStudentId())) {
                 log.warn("Unauthorized download attempt by student: {} for submission: {}",
                         student.getRollNo(), submissionId);
                 return ResponseEntity.status(403).build();
             }
 
-            // Download file from Supabase
+
             byte[] fileData = storageService.downloadFile(submission.getFilePath());
             ByteArrayResource resource = new ByteArrayResource(fileData);
 
-            // Determine content type
             String contentType = submission.getFileType() != null
                     ? submission.getFileType()
                     : "application/octet-stream";
@@ -244,9 +233,7 @@ public class StudentSubmissionController {
         }
     }
 
-    /**
-     * Check if file type is allowed
-     */
+
     private boolean isAllowedFileType(String contentType) {
         return contentType.equals("application/pdf") ||
                 contentType.equals("application/msword") ||

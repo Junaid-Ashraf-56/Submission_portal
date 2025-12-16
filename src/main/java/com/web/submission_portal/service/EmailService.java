@@ -27,7 +27,6 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    // ← FIXED: Increased timeout to 20 seconds instead of 5
     private static final int EMAIL_TIMEOUT_SECONDS = 20;
 
     public void sendOTPEmail(String toEmail, String otp) {
@@ -82,7 +81,6 @@ public class EmailService {
                 }
             });
 
-            // ← FIXED: Wait for 20 seconds instead of 5
             emailFuture.get(EMAIL_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
             emailLog.setStatus(EmailStatus.SENT);

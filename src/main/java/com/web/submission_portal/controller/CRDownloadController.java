@@ -29,10 +29,7 @@ public class CRDownloadController {
     private final BulkDownloadService bulkDownloadService;
     private final AssignmentService assignmentService;
 
-    /**
-     * Download all submissions for an assignment as ZIP
-     * Simple version - just downloads or redirects with error
-     */
+
     @GetMapping("/assignments/{id}/download-all")
     public ResponseEntity<Resource> downloadAllSubmissions(
             @PathVariable("id") Long assignmentId,
@@ -41,30 +38,23 @@ public class CRDownloadController {
         try {
             log.info("Download request for assignment: {}", assignmentId);
 
-            // Check if assignment exists
             Assignment assignment = assignmentService.findById(assignmentId);
 
-            // Check if there are submissions
             if (!bulkDownloadService.hasSubmissions(assignmentId)) {
                 log.warn("No submissions found for assignment: {}", assignmentId);
-                // Return empty response - JavaScript will handle the alert
                 return ResponseEntity.noContent().build();
             }
 
-            // Create ZIP file
             ByteArrayOutputStream zipFile = bulkDownloadService.downloadAllSubmissions(assignmentId);
 
-            // Create filename: DSA_20241208.zip
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             String fileName = sanitizeFileName(assignment.getSubjectTitle()) + "_" + timestamp + ".zip";
 
-            // Convert to resource
             ByteArrayResource resource = new ByteArrayResource(zipFile.toByteArray());
 
             log.info("Downloaded {} submissions for assignment: {}",
                     bulkDownloadService.getSubmissionCount(assignmentId), assignmentId);
 
-            // Return file download
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -77,9 +67,6 @@ public class CRDownloadController {
         }
     }
 
-    /**
-     * Clean filename for safe download
-     */
     private String sanitizeFileName(String fileName) {
         return fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
     }

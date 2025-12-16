@@ -24,22 +24,17 @@ public class OTPValidationService {
     private static final int OTP_LENGTH = 6;
     private static final int OTP_EXPIRY_SECONDS = 60;
     private static final Pattern OTP_PATTERN = Pattern.compile("^\\d{6}$");
-    private static final int MAX_OTP_ATTEMPTS = 3;
 
-    /**
-     * COMPLETE OTP VALIDATION IN JAVA
-     */
+
     public OTPValidationResult validateOTP(String email, String otp) {
         log.info("Starting OTP validation for email: {}", email);
 
-        // STEP 1: FORMAT VALIDATION
         OTPValidationResult formatCheck = validateFormat(otp);
         if (!formatCheck.valid()) {  // ← FIXED: Changed from valid() to !valid()
             log.warn("OTP format validation failed: {}", formatCheck.message());
             return formatCheck;
         }
 
-        // STEP 2: USER EXISTENCE CHECK
         OTPValidationResult userCheck = validateUserExists(email);
         if (!userCheck.valid()) {  // ← FIXED
             log.warn("User validation failed: {}", userCheck.message());
@@ -48,7 +43,6 @@ public class OTPValidationService {
 
         User user = userCheck.user();
 
-        // STEP 3: TOKEN EXISTENCE CHECK
         OTPValidationResult tokenCheck = validateTokenExists(user, otp);
         if (!tokenCheck.valid()) {  // ← FIXED
             log.warn("Token validation failed: {}", tokenCheck.message());
@@ -57,21 +51,18 @@ public class OTPValidationService {
 
         PasswordResetToken token = tokenCheck.token();
 
-        // STEP 4: ALREADY USED CHECK
         OTPValidationResult usedCheck = validateNotUsed(token);
         if (!usedCheck.valid()) {  // ← FIXED
             log.warn("Token already used: {}", usedCheck.message());
             return usedCheck;
         }
 
-        // STEP 5: EXPIRY CHECK (60 seconds from creation)
         OTPValidationResult expiryCheck = validateNotExpired(token);
         if (!expiryCheck.valid()) {  // ← FIXED
             log.warn("Token expired: {}", expiryCheck.message());
             return expiryCheck;
         }
 
-        // ALL CHECKS PASSED
         log.info("OTP validation successful for email: {}", email);
         return OTPValidationResult.success("OTP is valid", user, token);
     }
@@ -147,17 +138,9 @@ public class OTPValidationService {
         return OTPValidationResult.success("Token not expired");
     }
 
-    public boolean hasExceededAttempts(String email) {
-        return false;
-    }
 
-    public long getRemainingTimeInSeconds(PasswordResetToken token) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime createdAt = token.getCreatedAt();
-        long secondsSinceCreation = ChronoUnit.SECONDS.between(createdAt, now);
-        long remaining = OTP_EXPIRY_SECONDS - secondsSinceCreation;
-        return Math.max(0, remaining);
-    }
+
+
 
     public String sanitizeOTP(String otp) {
         if (otp == null) {
@@ -166,7 +149,6 @@ public class OTPValidationService {
         return otp.replaceAll("\\D", "");
     }
 
-    // ==================== VALIDATION RESULT ====================
 
     public record OTPValidationResult(
             boolean valid,
