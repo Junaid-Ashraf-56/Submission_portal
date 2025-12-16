@@ -129,11 +129,11 @@
                        class="btn btn-primary w-100">
                         <i class="bi bi-upload me-2"></i>Submit Now
                     </a>
-                    <a th:if="${submissionStatus.get(assignment.assignmentId)}"
-                       th:href="@{/student/assignments/{id}/my-submission(id=${assignment.assignmentId})}"
-                       class="btn btn-outline-primary w-100">
-                        <i class="bi bi-eye me-2"></i>View Submission
-                    </a>
+                    <div th:if="${submissionStatus.get(assignment.assignmentId)}"
+                         class="alert alert-success mb-0 text-center">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <strong>You have submitted this assignment</strong>
+                    </div>
                 </div>
             </div>
         </div>

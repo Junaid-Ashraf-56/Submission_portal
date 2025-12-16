@@ -33,7 +33,7 @@ public class CrAssignmentController {
     private final SubmissionRepository submissionRepository;
 
     public CrAssignmentController(UserRepository userRepository,
-                                 AssignmentService assignmentService, 
+                                  AssignmentService assignmentService,
                                   StudentRepository studentRepository,
                                   AssignmentRepository assignmentRepository,
                                   SubmissionRepository submissionRepository) {
@@ -49,6 +49,7 @@ public class CrAssignmentController {
         model.addAttribute("assignment", new Assignment());
         return "cr/create-assignment";
     }
+
     @PostMapping("/create-assignment")
     public String createAssignment(@ModelAttribute Assignment assignment,
                                    Authentication authentication,
@@ -67,21 +68,15 @@ public class CrAssignmentController {
         return "redirect:/cr/dashboard";
     }
 
-
-    @GetMapping("/assignments/{id}/submit")
-    public String submitAssignment(@PathVariable Long id, Model model, Authentication authentication){
-        getAssignmentForBoth(id, model, authentication, assignmentRepository, userRepository, studentRepository);
-
-        return "cr/submit-assignment";
-    }
-
-
+    // REMOVED the duplicate /assignments/{id}/submit mapping
+    // That's now handled by CrSubmissionController
 
     @GetMapping("assignments/{id}/extend")
     public String extendAssignment(@PathVariable Long id, Model model, Authentication authentication){
         getAssignmentForBoth(id, model, authentication, assignmentRepository, userRepository, studentRepository);
         return "cr/extend-deadline";
     }
+
     @PostMapping("assignments/{id}/extend")
     public String extendAssignmentInDataBase(@PathVariable Long id,
                                              @RequestParam("newEndTime") LocalDateTime newEndTime,
@@ -90,7 +85,7 @@ public class CrAssignmentController {
         Assignment assignment = assignmentRepository.findByAssignmentId(id).orElseThrow();
 
         if (newEndTime.isBefore(assignment.getEndTime())) {
-            model.addAttribute("error", "End time must be before start time");
+            model.addAttribute("error", "New end time must be after current end time");
             model.addAttribute("assignment",assignment);
             getAssignmentForBoth(id,model,authentication,assignmentRepository,userRepository,studentRepository);
             return "cr/extend-deadline";
@@ -101,13 +96,12 @@ public class CrAssignmentController {
         return "redirect:/cr/dashboard";
     }
 
-
-
     @GetMapping("/assignments/{id}/edit")
     public  String editAssignment(@PathVariable Long id, Model model, Authentication authentication){
         getAssignmentForBoth(id, model, authentication, assignmentRepository, userRepository, studentRepository);
         return "cr/edit-assignment";
     }
+
     @PostMapping("/assignments/{id}/edit")
     public String editAssignmentInDataBase(@PathVariable Long id,@ModelAttribute Assignment updatedAssignment){
         Assignment assignment = assignmentRepository.findByAssignmentId(id)
@@ -124,7 +118,6 @@ public class CrAssignmentController {
         assignmentRepository.save(assignment);
         return "redirect:/cr/dashboard";
     }
-
 
     @GetMapping("/assignments/{id}/submissions")
     public String viewAssignments(@PathVariable Long id, Model model, Authentication authentication){
@@ -146,13 +139,11 @@ public class CrAssignmentController {
 
         List<Assignment> assignment = assignmentService.getAssignmentsByCreator(user);
 
-        // CHANGE 1: Use Long for the key (Assignment ID), not String
+        // Use Long for the key (Assignment ID), not String
         Map<Long, Long> submissionCount = new HashMap<>();
 
         for (Assignment a : assignment) {
             long count = submissionRepository.countByAssignment(a);
-
-            // CHANGE 2: Use the Assignment ID as the key
             submissionCount.put(a.getAssignmentId(), count);
         }
 
@@ -162,7 +153,6 @@ public class CrAssignmentController {
         model.addAttribute("totalStudents", totalStudents);
         model.addAttribute("crName", student.getName());
     }
-
 
     static void getAssignmentForBoth(@PathVariable Long id,
                                      Model model,
@@ -180,7 +170,7 @@ public class CrAssignmentController {
 
         model.addAttribute("assignment", assignment);
         model.addAttribute("studentName", student.getName());
+        model.addAttribute("crName", student.getName());
         model.addAttribute("error",null);
     }
-
 }

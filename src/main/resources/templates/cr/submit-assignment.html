@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit Assignment - Assignment Portal</title>
+    <title>Submit Assignment - CR Portal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +13,6 @@
 </head>
 <body>
 
-<!-- Navbar -->
 <div class="container">
     <nav class="navbar navbar-expand-lg navbar-floating">
         <div class="container-fluid">
@@ -53,36 +52,32 @@
     </nav>
 </div>
 
-<!-- Main Content -->
 <div class="container my-5">
 
-    <!-- Page Header -->
     <div class="mb-4 animate-fadeIn">
         <a th:href="@{/cr/dashboard}" class="text-decoration-none text-muted d-inline-flex align-items-center mb-3">
             <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
         </a>
         <h1 class="fw-bold text-gradient mb-2">Submit Assignment</h1>
-        <p class="text-muted fs-5">Upload your assignment file</p>
+        <p class="text-muted fs-5">Upload your assignment file (CR Mode)</p>
     </div>
 
-    <!-- Submit Form Card -->
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card assignment-card animate-scaleIn">
                 <div class="card-body p-4">
 
-                    <!-- Assignment Info -->
                     <div class="text-center mb-4 pb-4 border-bottom">
                         <div class="d-inline-flex align-items-center gap-2 mb-3">
                             <span class="badge"
+                                  th:if="${assignment.assignmentType != null}"
                                   th:classappend="${assignment.assignmentType.name() == 'LAB'} ? 'bg-info' : 'bg-primary'"
                                   th:text="${assignment.assignmentType}">LAB</span>
                         </div>
-                        <h3 class="fw-bold mb-1" th:text="${assignment.subjectTitle}">Data Structures</h3>
-                        <p class="text-muted mb-0" th:text="${assignment.subjectCode}">CS-201</p>
+                        <h3 class="fw-bold mb-1" th:text="${assignment.subjectTitle}">Subject Title</h3>
+                        <p class="text-muted mb-0" th:text="${assignment.subjectCode}">Subject Code</p>
                     </div>
 
-                    <!-- Deadline Warning -->
                     <div class="alert alert-warning border-0 mb-4">
                         <div class="d-flex align-items-center">
                             <i class="bi bi-clock-fill me-3 fs-4"></i>
@@ -95,14 +90,12 @@
                         </div>
                     </div>
 
-                    <!-- Error Message -->
                     <div th:if="${error}" class="alert alert-danger border-0 animate-slideInLeft mb-4">
                         <i class="bi bi-exclamation-triangle-fill me-2"></i>
                         <span th:text="${error}">Error message</span>
                     </div>
 
-                    <!-- Upload Form -->
-                    <form th:action="@{/cr/submit/{id}/submit(id=${assignment.assignmentId})}"
+                    <form th:action="@{/cr/assignments/{id}/submit(id=${assignment.assignmentId})}"
                           method="POST"
                           enctype="multipart/form-data">
 
@@ -138,7 +131,6 @@
                             </div>
                         </div>
 
-                        <!-- Action Buttons -->
                         <div class="d-flex gap-3 mt-4">
                             <button type="submit" class="btn btn-primary flex-fill">
                                 <i class="bi bi-upload me-2"></i>Upload & Submit
@@ -152,7 +144,6 @@
                 </div>
             </div>
 
-            <!-- Help Text -->
             <div class="text-center mt-4 animate-fadeIn">
                 <small class="text-muted">
                     <i class="bi bi-shield-check me-1"></i>
@@ -177,32 +168,32 @@
         const fileInput = document.querySelector('input[type="file"]');
         const dropZone = fileInput.closest('.border');
 
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                const fileName = e.target.files[0].name;
-                const fileSize = (e.target.files[0].size / 1024 / 1024).toFixed(2);
+        if (fileInput && dropZone) {
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    dropZone.style.borderColor = '#0d6efd';
+                    dropZone.style.backgroundColor = '#e7f3ff';
+                }
+            });
+
+            // Drag and drop styling
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
                 dropZone.style.borderColor = '#0d6efd';
                 dropZone.style.backgroundColor = '#e7f3ff';
-            }
-        });
+            });
 
-        // Drag and drop styling
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = '#0d6efd';
-            dropZone.style.backgroundColor = '#e7f3ff';
-        });
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.style.borderColor = '';
+                dropZone.style.backgroundColor = '';
+            });
 
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.style.borderColor = '';
-            dropZone.style.backgroundColor = '';
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = '';
-            dropZone.style.backgroundColor = '';
-        });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '';
+                dropZone.style.backgroundColor = '';
+            });
+        }
     });
 </script>
 </body>
