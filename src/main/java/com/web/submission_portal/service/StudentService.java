@@ -44,7 +44,7 @@ public class StudentService {
         studentRepository.deleteById(id);
     }
 
-    public long countAllStudents() {
-        return studentRepository.count();
+    public Student getByUserId(long userId){
+        return studentRepository.findByUserUserId(userId);
     }
 }

@@ -31,9 +31,10 @@ public class CRController {
     @GetMapping("/manage-students")
     public String manageStudentsPage(Model model, Authentication auth) {
         User crUser = userService.findByEmail(auth.getName());
+        Student student = studentService.getByUserId(crUser.getUserId());
         List<Student> students = studentService.getAllStudents();
 
-        model.addAttribute("crName", crUser.getEmail());
+        model.addAttribute("crName", student.getName());
         model.addAttribute("students", students);
 
         return "cr/manage-students";
@@ -162,9 +163,10 @@ public class CRController {
     @GetMapping("/manage-assignments")
     public String manageAssignmentsPage(Model model, Authentication auth) {
         User crUser = userService.findByEmail(auth.getName());
+        Student student = studentService.findByUserId(crUser.getUserId());
         List<Assignment> assignments = assignmentService.getAssignmentsByCreator(crUser);
 
-        model.addAttribute("crName", crUser.getEmail());
+        model.addAttribute("crName", student.getName());
         model.addAttribute("assignments", assignments);
 
         return "cr/manage-assignments";
