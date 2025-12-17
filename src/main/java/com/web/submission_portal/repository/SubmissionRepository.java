@@ -13,9 +13,13 @@ import java.util.Optional;
 public interface SubmissionRepository extends JpaRepository<Submission, Long> {
 
     List<Submission> findByAssignmentAssignmentId(Long assignmentId);
+    List<Submission> findByAssignment(Assignment assignment);
+    List<Submission> findByStudent(Student student);
     Optional<Submission> findByStudentAndAssignment(Student student, Assignment assignment);
     boolean existsByStudentAndAssignment(Student student, Assignment assignment);
     long countByAssignment(Assignment assignment);
     long countByAssignmentAssignmentId(Long assignmentId);
     boolean existsByAssignmentAssignmentId(Long assignmentId);
+
+
 }

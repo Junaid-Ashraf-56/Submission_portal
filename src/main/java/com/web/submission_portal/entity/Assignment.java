@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "assignments")
@@ -44,6 +45,11 @@ public class Assignment {
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "assignment",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<Submission> submissions;
 
     @PrePersist
     protected void onCreate() {

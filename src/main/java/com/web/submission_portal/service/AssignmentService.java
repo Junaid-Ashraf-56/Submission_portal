@@ -34,4 +34,12 @@ public class AssignmentService {
     public Assignment findById(long assignmentId){
         return assignmentRepository.findFirstByAssignmentId(assignmentId);
     }
+
+    public Assignment save(Assignment assignment){
+       return assignmentRepository.save(assignment);
+    }
+
+    public void deleteById(long assignmentId){
+        assignmentRepository.deleteById(assignmentId);
+    }
 }
