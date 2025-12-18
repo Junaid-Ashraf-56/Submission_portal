@@ -18,17 +18,11 @@ public class StudentService {
         return studentRepository.findAll();
     }
 
-    public Student findById(Long id) {
-        return studentRepository.findById(id).orElse(null);
-    }
 
     public Student findByUserId(Long userId) {
         return studentRepository.findByUserUserId(userId);
     }
 
-    public Student findByRollNo(String rollNo) {
-        return studentRepository.findByRollNo(rollNo);
-    }
 
     public boolean existsByRollNo(String rollNo) {
         return studentRepository.existsByRollNo(rollNo);

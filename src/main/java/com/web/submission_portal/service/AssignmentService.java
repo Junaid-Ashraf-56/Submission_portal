@@ -27,10 +27,6 @@ public class AssignmentService {
         return assignmentRepository.findByCreatedBy(user);
     }
 
-    public String getAssignmentSubjectCode (Assignment assignment){
-        return assignment.getSubjectCode();
-    }
-
     public Assignment findById(long assignmentId){
         return assignmentRepository.findFirstByAssignmentId(assignmentId);
     }

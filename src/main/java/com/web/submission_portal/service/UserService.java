@@ -18,17 +18,11 @@ public class UserService {
         return userRepository.findByEmail(email).orElse(null);
     }
 
-    public User findById(Long id) {
-        return userRepository.findById(id).orElse(null);
-    }
 
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
 
     @Transactional
     public User save(User user) {

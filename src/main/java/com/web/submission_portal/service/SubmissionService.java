@@ -16,21 +16,10 @@ public class SubmissionService {
 
     private final SubmissionRepository submissionRepository;
 
-    public List<Submission> getAllSubmissions() {
-        return submissionRepository.findAll();
-    }
-
-    public List<Submission> findByAssignment(Assignment assignment) {
-        return submissionRepository.findByAssignment(assignment);
-    }
-
     public List<Submission> findByStudent(Student student) {
         return submissionRepository.findByStudent(student);
     }
 
-    public Submission findByAssignmentAndStudent(Assignment assignment, Student student) {
-        return submissionRepository.findByStudentAndAssignment(student,assignment).orElse(null);
-    }
 
     public Submission findById(Long id) {
         return submissionRepository.findById(id).orElse(null);
@@ -54,9 +43,4 @@ public class SubmissionService {
         submissionRepository.deleteById(id);
     }
 
-    @Transactional
-    public void deleteByStudent(Student student) {
-        List<Submission> submissions = findByStudent(student);
-        submissionRepository.deleteAll(submissions);
-    }
 }
