@@ -30,13 +30,13 @@ public class OTPValidationService {
         log.info("Starting OTP validation for email: {}", email);
 
         OTPValidationResult formatCheck = validateFormat(otp);
-        if (!formatCheck.valid()) {  // ← FIXED: Changed from valid() to !valid()
+        if (!formatCheck.valid()) {
             log.warn("OTP format validation failed: {}", formatCheck.message());
             return formatCheck;
         }
 
         OTPValidationResult userCheck = validateUserExists(email);
-        if (!userCheck.valid()) {  // ← FIXED
+        if (!userCheck.valid()) {
             log.warn("User validation failed: {}", userCheck.message());
             return userCheck;
         }
@@ -44,21 +44,20 @@ public class OTPValidationService {
         User user = userCheck.user();
 
         OTPValidationResult tokenCheck = validateTokenExists(user, otp);
-        if (!tokenCheck.valid()) {  // ← FIXED
+        if (!tokenCheck.valid()) {
             log.warn("Token validation failed: {}", tokenCheck.message());
             return tokenCheck;
         }
 
         PasswordResetToken token = tokenCheck.token();
-
         OTPValidationResult usedCheck = validateNotUsed(token);
-        if (!usedCheck.valid()) {  // ← FIXED
+        if (!usedCheck.valid()) {
             log.warn("Token already used: {}", usedCheck.message());
             return usedCheck;
         }
 
         OTPValidationResult expiryCheck = validateNotExpired(token);
-        if (!expiryCheck.valid()) {  // ← FIXED
+        if (!expiryCheck.valid()) {
             log.warn("Token expired: {}", expiryCheck.message());
             return expiryCheck;
         }
@@ -138,10 +137,6 @@ public class OTPValidationService {
         return OTPValidationResult.success("Token not expired");
     }
 
-
-
-
-
     public String sanitizeOTP(String otp) {
         if (otp == null) {
             return "";
@@ -166,14 +161,6 @@ public class OTPValidationService {
 
         public static OTPValidationResult failure(String message) {
             return new OTPValidationResult(false, message, null, null);
-        }
-
-        // ← FIXED: Removed the inverted @Override method
-        // Just use the record's built-in valid() accessor
-
-        @Override
-        public String toString() {
-            return String.format("OTPValidationResult{valid=%s, message='%s'}", valid, message);
         }
     }
 }

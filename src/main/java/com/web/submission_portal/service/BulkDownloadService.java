@@ -20,7 +20,7 @@ public class BulkDownloadService {
     private final StorageService StorageService;
 
     public ByteArrayOutputStream downloadAllSubmissions(Long assignmentId) throws IOException {
-        // Get all submissions
+
         List<Submission> submissions = submissionRepository.findByAssignmentAssignmentId(assignmentId);
 
         if (submissions.isEmpty()) {

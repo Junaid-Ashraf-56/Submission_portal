@@ -111,7 +111,6 @@ public class StorageService {
             connection.setConnectTimeout(10000);
             connection.setReadTimeout(30000);
 
-            // Write file data
             try (OutputStream os = connection.getOutputStream()) {
                 os.write(fileData);
                 os.flush();
@@ -120,7 +119,6 @@ public class StorageService {
             int responseCode = connection.getResponseCode();
 
             if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
-                // Return public URL
                 String publicUrl = String.format("%s/storage/v1/object/public/%s/%s",
                         supabaseUrl, bucketName, encodeUrlPath(filePath));
                 log.info("Upload successful. File available at: {}", publicUrl);
@@ -162,41 +160,14 @@ public class StorageService {
         }
     }
 
-    /**
-     * Check if file exists
-     */
-    public boolean fileExists(String filePath) {
-        try {
-            String checkUrl = String.format("%s/storage/v1/object/%s/%s",
-                    supabaseUrl, bucketName, encodeUrlPath(filePath));
-
-            HttpURLConnection connection = (HttpURLConnection) new URL(checkUrl).openConnection();
-            connection.setRequestMethod("HEAD");
-            connection.setRequestProperty("Authorization", "Bearer " + supabaseKey);
-
-            int responseCode = connection.getResponseCode();
-            connection.disconnect();
-
-            return responseCode == HttpURLConnection.HTTP_OK;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    /**
-     * Sanitize filename to remove special characters
-     */
     private String sanitizeFileName(String fileName) {
         if (fileName == null) return "file";
         return fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
     }
 
-    /**
-     * Encode URL path segments
-     */
+
     private String encodeUrlPath(String path) {
         try {
-            // Split by / and encode each segment
             String[] segments = path.split("/");
             StringBuilder encoded = new StringBuilder();
             for (int i = 0; i < segments.length; i++) {
@@ -210,9 +181,7 @@ public class StorageService {
         }
     }
 
-    /**
-     * Read error message from connection
-     */
+
     private String readErrorStream(HttpURLConnection connection) {
         try (InputStream errorStream = connection.getErrorStream()) {
             if (errorStream != null) {

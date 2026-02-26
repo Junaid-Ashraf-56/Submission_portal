@@ -26,8 +26,6 @@ public class CRController {
     private final SubmissionService submissionService;
     private final PasswordEncoder passwordEncoder;
 
-    // ==================== STUDENT MANAGEMENT ====================
-
     @GetMapping("/manage-students")
     public String manageStudentsPage(Model model, Authentication auth) {
         User crUser = userService.findByEmail(auth.getName());
@@ -59,7 +57,6 @@ public class CRController {
                 return "redirect:/cr/manage-students?error";
             }
 
-            // Create User
             User user = User.builder()
                     .email(email)
                     .password(passwordEncoder.encode("student123")) // Default password
@@ -69,7 +66,6 @@ public class CRController {
 
             User savedUser = userService.save(user);
 
-            // Create Student
             Student student = new Student();
             student.setUser(savedUser);
             student.setName(name);
@@ -132,19 +128,13 @@ public class CRController {
                 return "redirect:/cr/manage-students?error";
             }
 
-            // MANUAL DELETION ORDER (to avoid cascade issues):
-
-            // 1. First delete all submissions by this student
             List<Submission> submissions = submissionService.findByStudent(student);
             for (Submission submission : submissions) {
                 submissionService.deleteById(submission.getSubmissionId());
             }
-
-            // 2. Then delete the student record
             Long studentId = student.getStudentId();
             studentService.deleteById(studentId);
 
-            // 3. Finally delete the user account
             userService.deleteById(userId);
 
             redirectAttributes.addFlashAttribute("successMessage",
@@ -158,7 +148,7 @@ public class CRController {
         }
     }
 
-    // ==================== ASSIGNMENT MANAGEMENT ====================
+    //From here assignment is managed by the student
 
     @GetMapping("/manage-assignments")
     public String manageAssignmentsPage(Model model, Authentication auth) {
@@ -184,8 +174,6 @@ public class CRController {
                 return "redirect:/cr/dashboard?error";
             }
 
-            // CASCADE WORKS HERE because Assignment owns the Submission relationship
-            // All submissions will be automatically deleted
             assignmentService.deleteById(assignmentId);
 
             redirectAttributes.addFlashAttribute("successMessage",

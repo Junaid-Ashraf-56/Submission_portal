@@ -35,7 +35,6 @@ public class PasswordResetService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
 
-        // ← FIXED: Delete ALL old tokens for this user (both used and unused)
         deleteAllTokensForUser(user.getUserId());
         log.info("Deleted all old OTP tokens for user: {}", email);
 
@@ -67,32 +66,25 @@ public class PasswordResetService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // ← FIXED: Find the token but don't verify again (already verified in controller)
         PasswordResetToken token = tokenRepository
                 .findByOtpAndUserUserId(otp, user.getUserId())
                 .orElseThrow(() -> new RuntimeException("Invalid OTP"));
 
-        // Check if already used
         if (token.getUsed()) {
             throw new RuntimeException("This OTP has already been used");
         }
-
-        // Check if expired
         if (token.getExpiryTime().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("OTP has expired");
         }
 
-        // Update password
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         log.info("Password updated in database for user: {}", email);
 
-        // Mark OTP as used
         token.setUsed(true);
         tokenRepository.save(token);
         log.info("OTP marked as used");
 
-        // Send confirmation email
         try {
             emailService.sendPasswordResetConfirmation(email);
         } catch (Exception e) {

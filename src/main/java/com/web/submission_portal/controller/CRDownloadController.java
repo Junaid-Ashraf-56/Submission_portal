@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
@@ -32,8 +31,7 @@ public class CRDownloadController {
 
     @GetMapping("/assignments/{id}/download-all")
     public ResponseEntity<Resource> downloadAllSubmissions(
-            @PathVariable("id") Long assignmentId,
-            RedirectAttributes redirectAttributes) {
+            @PathVariable("id") Long assignmentId) {
 
         try {
             log.info("Download request for assignment: {}", assignmentId);

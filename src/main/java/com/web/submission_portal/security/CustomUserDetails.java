@@ -25,5 +25,4 @@ public record CustomUserDetails(User user) implements UserDetails {
         return user.getEmail();
     }
 
-    // other overrides: isAccountNonExpired, isAccountNonLocked, etc.
 }

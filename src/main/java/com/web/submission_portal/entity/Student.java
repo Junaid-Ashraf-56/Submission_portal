@@ -28,6 +28,9 @@ public class Student {
     @Column(length = 15)
     private String phoneNumber;
 
+    @Column(nullable = false,length = 10)
+    private char section;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     private Gender gender;

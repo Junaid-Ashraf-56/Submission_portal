@@ -24,30 +24,28 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
-        System.out.println("Configuration");
         http
-                .authorizeHttpRequests(auth->auth
-                        .requestMatchers("/css/**","/js/**","/images/**","/").permitAll()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/css/**","/js/**","/").permitAll()
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/cr/**").hasAuthority("ROLE_CR")
                         .requestMatchers("/student/**").hasAnyAuthority("ROLE_STUDENT","ROLE_CR")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form->form
-                        .loginPage("/auth/login")
-                        .loginProcessingUrl("/auth/login")
+                        .loginPage("auth/login")
+                        .loginProcessingUrl("auth/login")
                         .successHandler(successHandler)
                         .failureUrl("/auth/login?error=true")
                         .permitAll()
                 )
-                .logout(logout -> logout
+                .logout( logout->logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/auth/login?logout=true")
                         .deleteCookies("JSESSIONID")
                         .invalidateHttpSession(true)
                         .permitAll()
                 )
-                .sessionManagement(session -> session
+                .sessionManagement(session ->session
                         .maximumSessions(1)
                         .maxSessionsPreventsLogin(false)
                 )

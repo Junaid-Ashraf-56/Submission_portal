@@ -56,7 +56,7 @@ public class EmailService {
     }
 
     private void sendEmailWithTimeout(String toEmail, String subject, String htmlContent)
-            throws TimeoutException, Exception {
+            throws Exception {
 
         EmailLog emailLog = new EmailLog();
         emailLog.setRecipient(toEmail);
@@ -119,16 +119,16 @@ public class EmailService {
                     <div class="header">
                         <div class="logo">🎓 Assignment Portal</div>
                     </div>
-                    
+                   \s
                     <div class="content">
                         <h2>Password Reset Request</h2>
                         <p>Hello,</p>
                         <p>We received a request to reset your password. Use the OTP code below to proceed:</p>
-                        
+                       \s
                         <div class="otp-box">
-                            """ + otp + """
+                           \s""" + otp + """
                         </div>
-                        
+                       \s
                         <div class="warning">
                             <strong>⚠️ Important:</strong>
                             <ul style="margin: 10px 0;">
@@ -137,11 +137,11 @@ public class EmailService {
                                 <li>If you didn't request this, please ignore this email</li>
                             </ul>
                         </div>
-                        
+                       \s
                         <p>If you have any issues, please contact support.</p>
                         <p>Best regards,<br><strong>Assignment Portal Team</strong></p>
                     </div>
-                    
+                   \s
                     <div class="footer">
                         <p>This is an automated email. Please do not reply.</p>
                         <p>&copy; 2024 Assignment Portal. All rights reserved.</p>
@@ -149,7 +149,7 @@ public class EmailService {
                 </div>
             </body>
             </html>
-            """;
+           \s""";
     }
 
     private String buildPasswordResetConfirmationTemplate() {
@@ -173,26 +173,26 @@ public class EmailService {
                     <div class="header">
                         <div class="logo">🎓 Assignment Portal</div>
                     </div>
-                    
+                   \s
                     <div class="success-icon">✅</div>
-                    
+                   \s
                     <div class="content">
                         <h2 style="text-align: center;">Password Reset Successful!</h2>
                         <p>Hello,</p>
                         <p>Your password has been successfully reset. You can now log in with your new password.</p>
-                        
+                       \s
                         <div class="alert">
                             <strong>🔒 Security Tip:</strong>
                             <p style="margin: 10px 0;">If you didn't make this change, please contact support immediately.</p>
                         </div>
-                        
+                       \s
                         <p style="text-align: center; margin-top: 30px;">
                             <a href="http://localhost:8080/login" style="background-color: #4F46E5; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">Login Now</a>
                         </p>
-                        
+                       \s
                         <p>Best regards,<br><strong>Assignment Portal Team</strong></p>
                     </div>
-                    
+                   \s
                     <div class="footer">
                         <p>This is an automated email. Please do not reply.</p>
                         <p>&copy; 2024 Assignment Portal. All rights reserved.</p>
@@ -200,6 +200,6 @@ public class EmailService {
                 </div>
             </body>
             </html>
-            """;
+           \s""";
     }
 }
