@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student,Long> {
-    Student findByRollNo(String roll_no);
+    List<Student> findBySection(String section);
     Student findByUserUserId(Long user_id);
     Optional<Student> findByUser(User user);
     boolean existsByRollNo(String rollNo);

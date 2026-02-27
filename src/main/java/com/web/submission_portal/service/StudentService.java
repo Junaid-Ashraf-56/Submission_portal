@@ -14,8 +14,8 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
 
-    public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+    public List<Student> getStudentBySection(String section) {
+        return studentRepository.findBySection(section);
     }
 
 

@@ -56,7 +56,7 @@ public class CrDashboardController {
         CrAssignmentController.submissionDetails(model, user, student, assignmentService, submissionRepository, studentRepository);
 
         //These for the assignment submitted by the cr as student
-        List<Assignment> assignments = assignmentRepository.findAll();
+        List<Assignment> assignments = assignmentRepository.findAssignmentsForSection(student.getSection());
         model.addAttribute("assignments", assignments);
 
 

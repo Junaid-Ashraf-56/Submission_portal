@@ -29,7 +29,7 @@ public class Student {
     private String phoneNumber;
 
     @Column(nullable = false,length = 10)
-    private char section;
+    private String section;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)

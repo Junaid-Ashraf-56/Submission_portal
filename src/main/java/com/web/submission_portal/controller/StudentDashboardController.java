@@ -51,7 +51,7 @@ public class StudentDashboardController {
         model.addAttribute("studentRollNo", student.getRollNo());
 
         //These for the assignment submitted by the student
-        List<Assignment> assignments = assignmentRepository.findAll();
+        List<Assignment> assignments = assignmentRepository.findAssignmentsForSection(student.getSection());
         model.addAttribute("assignments", assignments);
 
 

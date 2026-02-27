@@ -30,7 +30,7 @@ public class CRController {
     public String manageStudentsPage(Model model, Authentication auth) {
         User crUser = userService.findByEmail(auth.getName());
         Student student = studentService.getByUserId(crUser.getUserId());
-        List<Student> students = studentService.getAllStudents();
+        List<Student> students = studentService.getStudentBySection(student.getSection());
 
         model.addAttribute("crName", student.getName());
         model.addAttribute("students", students);
@@ -43,6 +43,7 @@ public class CRController {
                              @RequestParam String rollNo,
                              @RequestParam String email,
                              @RequestParam(required = false) String phoneNumber,
+                             @RequestParam(required = false) String section,
                              @RequestParam Gender gender,
                              RedirectAttributes redirectAttributes) {
         try {
@@ -71,6 +72,7 @@ public class CRController {
             student.setName(name);
             student.setRollNo(rollNo);
             student.setPhoneNumber(phoneNumber);
+            student.setSection(section);
             student.setGender(gender);
 
             studentService.save(student);
@@ -91,6 +93,7 @@ public class CRController {
                                 @RequestParam String name,
                                 @RequestParam(required = false) String phoneNumber,
                                 @RequestParam Gender gender,
+                                @RequestParam(required = false) String section,
                                 RedirectAttributes redirectAttributes) {
         try {
             Student student = studentService.findByUserId(userId);
@@ -103,6 +106,7 @@ public class CRController {
             student.setName(name);
             student.setPhoneNumber(phoneNumber);
             student.setGender(gender);
+            student.setSection(section);
 
             studentService.save(student);
 
