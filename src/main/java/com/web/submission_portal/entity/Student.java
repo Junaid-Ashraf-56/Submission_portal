@@ -31,6 +31,9 @@ public class Student {
     @Column(nullable = false,length = 10)
     private String section;
 
+    @Column(nullable = false,length = 100)
+    private String university;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     private Gender gender;

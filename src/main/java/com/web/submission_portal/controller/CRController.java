@@ -45,7 +45,8 @@ public class CRController {
                              @RequestParam(required = false) String phoneNumber,
                              @RequestParam(required = false) String section,
                              @RequestParam Gender gender,
-                             RedirectAttributes redirectAttributes) {
+                             RedirectAttributes redirectAttributes,
+                             Authentication authentication) {
         try {
             // Check if email or roll number already exists
             if (userService.existsByEmail(email)) {
@@ -67,12 +68,17 @@ public class CRController {
 
             User savedUser = userService.save(user);
 
+            User crUser = userService.findByEmail(authentication.getName());
+            Student crStudent = studentService.findByUserId(crUser.getUserId());
+
+
             Student student = new Student();
             student.setUser(savedUser);
             student.setName(name);
             student.setRollNo(rollNo);
             student.setPhoneNumber(phoneNumber);
             student.setSection(section);
+            student.setUniversity(crStudent.getUniversity());
             student.setGender(gender);
 
             studentService.save(student);
