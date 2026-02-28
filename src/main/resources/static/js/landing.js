@@ -16,7 +16,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
         if (target) {
-            const navbarHeight = document.querySelector('.navbar-landing').offsetHeight;
+            const navbarHeight = 80;
             const targetPosition = target.offsetTop - navbarHeight;
 
             window.scrollTo({
@@ -27,41 +27,8 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Form submission handling
-const contactForm = document.querySelector('.contact-form form');
-if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        // Get form data
-        const formData = new FormData(this);
-
-        // Show loading state
-        const submitBtn = this.querySelector('.btn-submit');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Sending...';
-        submitBtn.disabled = true;
-
-        // Simulate form submission (replace with actual AJAX call)
-        setTimeout(() => {
-            // Reset form
-            this.reset();
-
-            // Show success message
-            submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Message Sent!';
-            submitBtn.classList.remove('btn-submit');
-            submitBtn.classList.add('btn-success');
-
-            // Reset button after 3 seconds
-            setTimeout(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.classList.remove('btn-success');
-                submitBtn.classList.add('btn-submit');
-                submitBtn.disabled = false;
-            }, 3000);
-        }, 1500);
-    });
-}
+// Form submission handling - DISABLED for backend handling
+// The form now submits directly to Spring Boot backend
 
 // Video placeholder click handler
 const videoPlaceholder = document.querySelector('.video-placeholder');

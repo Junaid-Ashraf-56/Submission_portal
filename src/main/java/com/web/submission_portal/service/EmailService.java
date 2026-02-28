@@ -55,6 +55,17 @@ public class EmailService {
         }
     }
 
+    public void sendContactFormInfo(String name,String email,String topic,String message){
+        String subject = "Problem face by Student - Assignment Portal";
+        String htmlContent = buildContactFormTemplate(name,email,topic,message);
+
+        try {
+            sendEmailWithTimeout(fromEmail,subject,htmlContent);
+        }catch (Exception e){
+            log.error("Check your internet connection: {}",e.getMessage());
+            throw new RuntimeException("Failed to send email: " + e.getMessage());
+        }
+    }
     private void sendEmailWithTimeout(String toEmail, String subject, String htmlContent)
             throws Exception {
 
@@ -97,7 +108,68 @@ public class EmailService {
             emailLogsRepository.save(emailLog);
         }
     }
-
+    private String buildContactFormTemplate(String name, String email, String topic, String message) {
+        return """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
+                    .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                    .header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 3px solid #667eea; }
+                    .logo { font-size: 24px; font-weight: bold; color: #667eea; }
+                    .content { color: #333; line-height: 1.6; }
+                    .info-box { background-color: #f7fafc; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #667eea; }
+                    .label { font-weight: bold; color: #667eea; display: block; margin-bottom: 5px; }
+                    .value { color: #2d3748; }
+                    .message-box { background-color: #fff; border: 2px solid #e2e8f0; padding: 15px; border-radius: 8px; margin: 20px 0; }
+                    .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #666; font-size: 12px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <div class="logo">🎓 Assignment Portal</div>
+                        <p style="color: #718096; margin-top: 10px;">New Contact Form Submission</p>
+                    </div>
+                    
+                    <div class="content">
+                        <p>You have received a new message from the contact form:</p>
+                        
+                        <div class="info-box">
+                            <span class="label">Name:</span>
+                            <span class="value">%s</span>
+                        </div>
+                        
+                        <div class="info-box">
+                            <span class="label">Email:</span>
+                            <span class="value">%s</span>
+                        </div>
+                        
+                        <div class="info-box">
+                            <span class="label">Subject:</span>
+                            <span class="value">%s</span>
+                        </div>
+                        
+                        <div class="message-box">
+                            <span class="label">Message:</span>
+                            <p class="value">%s</p>
+                        </div>
+                        
+                        <p style="color: #718096; font-size: 14px; margin-top: 20px;">
+                            <strong>Note:</strong> Please respond to this inquiry at the sender's email address.
+                        </p>
+                    </div>
+                    
+                    <div class="footer">
+                        <p>This is an automated email from Assignment Portal contact form.</p>
+                        <p>&copy; 2024 Assignment Portal. All rights reserved.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """.formatted(name, email, topic, message);
+    }
     private String buildOTPEmailTemplate(String otp) {
         return """
             <!DOCTYPE html>

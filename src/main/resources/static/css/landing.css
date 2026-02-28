@@ -6,6 +6,11 @@
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+}
+
 body {
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
@@ -13,9 +18,9 @@ body {
 
 /* Navbar Styles */
 .navbar-landing {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(10px);
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
     padding: 1rem 0;
     position: fixed;
     width: 100%;
@@ -107,7 +112,7 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     position: relative;
     overflow: hidden;
-    padding-top: 80px;
+    padding: 100px 0 80px 0;
 }
 
 .hero-section::before {
@@ -271,6 +276,7 @@ body {
 .tutorial-section {
     padding: 6rem 0;
     background: white;
+    min-height: 100vh;
 }
 
 .video-container {
@@ -334,8 +340,11 @@ body {
 
 /* Contact Section */
 .contact-section {
-    padding: 6rem 0;
+    padding: 8rem 0;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
 }
 
 .contact-form {
