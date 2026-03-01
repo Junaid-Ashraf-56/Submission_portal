@@ -44,6 +44,12 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
 
+<!--        Disable message-->
+
+        <div th:if="${param.error}" class="alert alert-danger">
+            Invalid email or password. If your account is pending, please wait for admin approval.
+        </div>
+
         <form th:action="@{/auth/login}" method="POST">
 
             <!-- Email Address -->

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Pending - Assignment Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes moveBackground {
+            0%   { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .shape {
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+        .shape:nth-child(1) { width: 80px;  height: 80px;  top: 10%; left: 10%; animation-delay: 0s; }
+        .shape:nth-child(2) { width: 120px; height: 120px; top: 70%; left: 80%; animation-delay: 2s; }
+        .shape:nth-child(3) { width: 60px;  height: 60px;  top: 40%; left: 5%;  animation-delay: 4s; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50%       { transform: translateY(-30px) rotate(180deg); }
+        }
+
+        /* Card */
+        .pending-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+        }
+
+        .pending-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 48px 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            animation: slideUp 0.6s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Icon */
+        .pending-icon {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            animation: pulse 2s ease-in-out infinite;
+            box-shadow: 0 8px 25px rgba(253,160,133,0.4);
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 8px 25px rgba(253,160,133,0.4); }
+            50%       { transform: scale(1.05); box-shadow: 0 12px 35px rgba(253,160,133,0.6); }
+        }
+        .pending-icon i { font-size: 40px; color: #fff; }
+
+        /* Title */
+        h1 {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #6c757d;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+
+        /* Steps */
+        .steps-box {
+            background: #f8f9ff;
+            border: 1px solid #e8ecff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 28px;
+            text-align: left;
+        }
+        .steps-box h6 {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #adb5bd;
+            margin-bottom: 14px;
+        }
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #eef0ff;
+        }
+        .step-item:last-child { border-bottom: none; }
+        .step-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .step-num.done    { background: rgba(46,213,115,0.15); color: #27ae60; }
+        .step-num.current { background: rgba(253,160,133,0.2); color: #e67e22; }
+        .step-num.waiting { background: rgba(102,126,234,0.12); color: #667eea; }
+
+        .step-text strong {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #343a40;
+        }
+        .step-text span {
+            font-size: 0.78rem;
+            color: #adb5bd;
+        }
+
+        /* Status badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(253,160,133,0.15);
+            border: 1px solid rgba(253,160,133,0.4);
+            color: #e67e22;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            letter-spacing: 0.3px;
+        }
+        .status-badge i { font-size: 0.85rem; }
+
+        /* Button */
+        .btn-login {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 14px 24px;
+            font-weight: 600;
+            font-size: 15px;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: rgba(255,255,255,0.2);
+            transition: left 0.5s ease;
+        }
+        .btn-login:hover::before { left: 100%; }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102,126,234,0.4);
+            color: #fff;
+        }
+
+        .help-text {
+            margin-top: 16px;
+            font-size: 0.82rem;
+            color: #adb5bd;
+        }
+        .help-text a {
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .help-text a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="shape"></div>
+<div class="shape"></div>
+<div class="shape"></div>
+
+<div class="pending-container">
+    <div class="pending-card">
+
+        <!-- Icon -->
+        <div class="pending-icon">
+            <i class="bi bi-hourglass-split"></i>
+        </div>
+
+        <!-- Status Badge -->
+        <div class="status-badge">
+            <i class="bi bi-clock-fill"></i> Account Pending Approval
+        </div>
+
+        <!-- Title -->
+        <h1>You're Almost There!</h1>
+        <p class="subtitle">
+            Your email has been verified successfully. Your CR account is now awaiting
+            admin approval before you can log in.
+        </p>
+
+        <!-- Steps -->
+        <div class="steps-box">
+            <h6>What happens next?</h6>
+
+            <div class="step-item">
+                <div class="step-num done"><i class="bi bi-check"></i></div>
+                <div class="step-text">
+                    <strong>Registration Submitted</strong>
+                    <span>Your details have been saved</span>
+                </div>
+            </div>
+
+            <div class="step-item">
+                <div class="step-num done"><i class="bi bi-check"></i></div>
+                <div class="step-text">
+                    <strong>Email Verified</strong>
+                    <span>OTP confirmed successfully</span>
+                </div>
+            </div>
+
+            <div class="step-item">
+                <div class="step-num current">3</div>
+                <div class="step-text">
+                    <strong>Admin Review</strong>
+                    <span>Admin will verify your request</span>
+                </div>
+            </div>
+
+            <div class="step-item">
+                <div class="step-num waiting">4</div>
+                <div class="step-text">
+                    <strong>Account Activated</strong>
+                    <span>You'll be able to log in once approved</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <a th:href="@{/auth/login}" class="btn-login">
+            <i class="bi bi-box-arrow-in-right me-2"></i>Go to Login
+        </a>
+
+        <p class="help-text">
+            Having issues? <a href="mailto:support@portal.com">Contact support</a>
+        </p>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

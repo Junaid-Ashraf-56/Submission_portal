@@ -2,6 +2,7 @@ package com.web.submission_portal.Repository;
 
 import com.web.submission_portal.entity.Assignment;
 import com.web.submission_portal.entity.User;
+import com.web.submission_portal.enums.AccountStatus;
 import com.web.submission_portal.enums.AssignmentType;
 import com.web.submission_portal.enums.Role;
 import com.web.submission_portal.repository.AssignmentRepository;
@@ -33,7 +34,7 @@ public class AssignmentRepositoryTest {
         User user = User.builder()
                         .email("junaid@example.com")
                         .password("secret")
-                        .isFirstLogin(true)
+                        .status(AccountStatus.APPROVED)
                         .role(Role.ROLE_STUDENT)
                         .createdAt(LocalDateTime.now())
                         .build();

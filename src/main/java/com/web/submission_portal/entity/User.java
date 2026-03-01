@@ -1,5 +1,6 @@
 package com.web.submission_portal.entity;
 
+import com.web.submission_portal.enums.AccountStatus;
 import com.web.submission_portal.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,8 +26,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Boolean isFirstLogin = true;
+    private AccountStatus status = AccountStatus.PENDING;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

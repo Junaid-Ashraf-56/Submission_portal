@@ -1,6 +1,7 @@
 package com.web.submission_portal.controller;
 
 import com.web.submission_portal.entity.*;
+import com.web.submission_portal.enums.AccountStatus;
 import com.web.submission_portal.enums.Gender;
 import com.web.submission_portal.enums.Role;
 import com.web.submission_portal.service.*;
@@ -63,7 +64,7 @@ public class CRController {
                     .email(email)
                     .password(passwordEncoder.encode("student123")) // Default password
                     .role(Role.ROLE_STUDENT)
-                    .isFirstLogin(true)
+                    .status(AccountStatus.APPROVED)
                     .build();
 
             User savedUser = userService.save(user);

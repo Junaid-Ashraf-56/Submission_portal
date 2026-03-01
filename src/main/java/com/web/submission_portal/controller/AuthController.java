@@ -1,7 +1,11 @@
 package com.web.submission_portal.controller;
 
-import com.web.submission_portal.service.OTPValidationService;
-import com.web.submission_portal.service.PasswordResetService;
+import com.web.submission_portal.entity.Student;
+import com.web.submission_portal.entity.User;
+import com.web.submission_portal.enums.AccountStatus;
+import com.web.submission_portal.enums.Gender;
+import com.web.submission_portal.enums.Role;
+import com.web.submission_portal.service.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +21,10 @@ public class AuthController {
 
     private final PasswordResetService passwordResetService;
     private final OTPValidationService otpValidationService;
+    private final UserService userService;
+    private final StudentService studentService;
+    private final OTPGeneratorService otpGeneratorService;
+    private final EmailService emailService;
 
 
     @GetMapping("/forgot-password")
@@ -37,6 +45,7 @@ public class AuthController {
 
             session.setAttribute("resetEmail", email);
             session.setAttribute("otpSentTime", System.currentTimeMillis());
+            session.setAttribute("flow", "forgotPassword");
 
             log.info("OTP sent successfully, redirecting to verify-otp");
 
@@ -86,27 +95,90 @@ public class AuthController {
 
             log.info("Verifying OTP for email: {}", email);
 
-            OTPValidationService.OTPValidationResult result =
-                    otpValidationService.validateOTP(email, otp);
+            String flow = (String)session.getAttribute("flow");
 
-            if (!result.valid()) {
-                throw new RuntimeException(result.message());
+            if (flow == null) {
+                throw new RuntimeException("Invalid session state.");
             }
 
             Long otpSentTime = (Long) session.getAttribute("otpSentTime");
             if (otpSentTime != null) {
                 long elapsedSeconds = (System.currentTimeMillis() - otpSentTime) / 1000;
-                if (elapsedSeconds > 60) {
+                if (elapsedSeconds > 60 ) {
+                    if ("register".equals(flow)){
+                        session.removeAttribute("pendingName");
+                        session.removeAttribute("pendingRollNo");
+                        session.removeAttribute("pendingGender");
+                        session.removeAttribute("pendingPhoneNumber");
+                        session.removeAttribute("pendingSection");
+                        session.removeAttribute("pendingUniversity");
+                        session.removeAttribute("pendingEmail");
+                        session.removeAttribute("pendingPassword");
+                        session.removeAttribute("pendingOTP");
+                    }
                     session.removeAttribute("resetEmail");
                     session.removeAttribute("otpSentTime");
+                    session.removeAttribute("flow");
                     throw new RuntimeException("OTP expired. Please request a new one.");
                 }
             }
 
-            session.setAttribute("verifiedOTP", otp);
-            log.info("OTP verified successfully for: {}", email);
 
-            return "redirect:/auth/reset-password";
+            if ("register".equals(flow)){
+                String pendingOTP = (String) session.getAttribute("pendingOTP");
+                System.out.println("These are the otps ");
+                System.out.println(pendingOTP);
+                System.out.println(otp);
+                if (!otp.equals(pendingOTP)) {
+                    throw new RuntimeException("Invalid OTP. Please check and try again.");
+                }
+                session.removeAttribute("pendingOTP");
+
+                User userCR = User.builder()
+                        .email((String) session.getAttribute("pendingEmail"))
+                        .password((String) session.getAttribute("pendingPassword"))
+                        .status(AccountStatus.PENDING)
+                        .role(Role.ROLE_CR)
+                        .build();
+
+                userService.save(userCR);
+
+                Student crAsStudent = new Student();
+                crAsStudent.setUser(userCR);
+                crAsStudent.setName((String) session.getAttribute("pendingName"));
+                crAsStudent.setRollNo((String) session.getAttribute("pendingRollNo"));
+                crAsStudent.setPhoneNumber((String)session.getAttribute("pendingPhoneNumber"));
+                crAsStudent.setUniversity((String) session.getAttribute("pendingUniversity"));
+                crAsStudent.setSection((String)session.getAttribute("pendingSection"));
+                crAsStudent.setGender((Gender) session.getAttribute("pendingGender"));
+
+                studentService.save(crAsStudent);
+
+
+                session.removeAttribute("pendingName");
+                session.removeAttribute("pendingRollNo");
+                session.removeAttribute("pendingGender");
+                session.removeAttribute("pendingPhoneNumber");
+                session.removeAttribute("pendingSection");
+                session.removeAttribute("pendingUniversity");
+                session.removeAttribute("pendingEmail");
+                session.removeAttribute("pendingPassword");
+                session.removeAttribute("resetEmail");
+                session.removeAttribute("otpSentTime");
+                session.removeAttribute("flow");
+
+
+                redirectAttributes.addFlashAttribute("successMessage","Your account is in pending");
+                return "redirect:/auth/pending";
+            }else {
+                OTPValidationService.OTPValidationResult result =
+                        otpValidationService.validateOTP(email, otp);
+                if (!result.valid()) {
+                    throw new RuntimeException(result.message());
+                }
+                session.setAttribute("verifiedOTP", otp);
+                return "redirect:/auth/reset-password";
+            }
 
         } catch (RuntimeException e) {
             log.error("OTP verification failed: {}", e.getMessage());
@@ -120,16 +192,19 @@ public class AuthController {
     public String resendOTP(HttpSession session) {
         try {
             String email = (String) session.getAttribute("resetEmail");
+            String flow  = (String) session.getAttribute("flow");
 
-            if (email == null) {
-                return "error:Session expired";
+            if (email == null) return "error:Session expired";
+
+            if ("register".equals(flow)) {
+                String otp = otpGeneratorService.generateOTP();
+                emailService.sendOTPEmail(email, otp);
+                session.setAttribute("pendingOTP", otp);
+            } else {
+                passwordResetService.sendOTP(email);
             }
 
-            passwordResetService.sendOTP(email);
-
             session.setAttribute("otpSentTime", System.currentTimeMillis());
-
-            log.info("OTP resent successfully to: {}", email);
             return "success";
 
         } catch (Exception e) {
