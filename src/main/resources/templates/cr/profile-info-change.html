@@ -20,15 +20,14 @@
             <a class="navbar-brand" th:href="@{/cr/dashboard}">
                 <i class="bi bi-cloud-upload-fill me-2"></i> Assignment Portal
             </a>
-
-            <button class="navbar-toggler border-0 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler border-0 text-white" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-2">
                     <li class="nav-item">
-                        <a class="nav-link active" th:href="@{/cr/dashboard}">
+                        <a class="nav-link" th:href="@{/cr/dashboard}">
                             <i class="bi bi-speedometer2 me-1"></i>Dashboard
                         </a>
                     </li>
@@ -43,12 +42,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/cr/profile}">
+                        <a class="nav-link active" th:href="@{/cr/profile}">
                             <i class="bi bi-person me-1"></i>Profile
                         </a>
                     </li>
                 </ul>
-
                 <div class="d-flex align-items-center gap-3">
                     <span class="badge bg-primary">CR</span>
                     <span class="text-white fw-semibold" th:text="${crName}">CR Name</span>
@@ -63,98 +61,172 @@
     </nav>
 </div>
 
-
 <!-- Main Content -->
 <div class="container my-5">
 
-    <!-- Page Header -->
     <div class="mb-5 animate-fadeIn">
         <h1 class="fw-bold text-gradient mb-2">
             <i class="bi bi-pencil-square me-2"></i>Edit Profile
         </h1>
         <p class="text-muted fs-5">
             <span class="badge bg-primary me-2">Class Representative</span>
-            Update your personal information
+            Update your personal and class information
         </p>
     </div>
 
-    <!-- Edit Form Card -->
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card assignment-card animate-scaleIn">
                 <div class="card-body p-4">
 
-                    <!-- Success Message -->
+                    <!-- Flash Messages -->
                     <div th:if="${param.updated}" class="alert alert-success border-0 animate-slideInLeft">
                         <i class="bi bi-check-circle-fill me-2"></i>
                         Profile updated successfully!
                     </div>
+                    <div th:if="${successMessage}" class="alert alert-success border-0">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <span th:text="${successMessage}"></span>
+                    </div>
+                    <div th:if="${errorMessage}" class="alert alert-danger border-0">
+                        <i class="bi bi-exclamation-circle-fill me-2"></i>
+                        <span th:text="${errorMessage}"></span>
+                    </div>
 
-                    <!-- Form -->
                     <form th:action="@{/cr/profile-info-change}" method="POST">
+
+                        <!-- ── Personal Information ── -->
+                        <div class="section-divider mb-3">
+                            <span class="fw-bold text-primary">
+                                <i class="bi bi-person-fill me-1"></i> Personal Information
+                            </span>
+                        </div>
 
                         <div class="row g-4">
 
-                            <!-- Roll Number -->
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">
-                                    <i class="bi bi-card-text me-2 text-primary"></i>Roll Number
-                                </label>
-                                <input type="text"
-                                       class="form-control"
-                                       name="rollNo"
-                                       th:value="${crRollNo}"
-                                       readonly>
-                                <small class="text-muted">This field cannot be changed</small>
-                            </div>
-
-                            <!-- Full Name -->
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">
                                     <i class="bi bi-person-fill me-2 text-primary"></i>Full Name
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="text"
-                                       class="form-control"
-                                       name="name"
-                                       th:value="${crName}"
-                                       required>
+                                <input type="text" class="form-control"
+                                       name="name" th:value="${crName}" required>
                             </div>
 
-                            <!-- Phone Number -->
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">
                                     <i class="bi bi-telephone-fill me-2 text-primary"></i>Phone Number
                                 </label>
-                                <input type="text"
-                                       class="form-control"
-                                       name="phoneNumber"
-                                       th:value="${crPhoneNumber}"
-                                       placeholder="Enter phone number">
+                                <input type="text" class="form-control"
+                                       name="phoneNumber" th:value="${crPhoneNumber}"
+                                       placeholder="e.g. 0300-1234567">
                             </div>
 
-                            <!-- Gender -->
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">
                                     <i class="bi bi-gender-ambiguous me-2 text-primary"></i>Gender
                                 </label>
                                 <select class="form-select" name="gender">
-                                    <option value="MALE" th:selected="${crGender == 'MALE'}">Male</option>
+                                    <option value="MALE"   th:selected="${crGender == 'MALE'}">Male</option>
                                     <option value="FEMALE" th:selected="${crGender == 'FEMALE'}">Female</option>
-                                    <option value="OTHER" th:selected="${crGender == 'OTHER'}">Other</option>
+                                    <option value="OTHER"  th:selected="${crGender == 'OTHER'}">Other</option>
                                 </select>
                             </div>
 
-                            <!-- Email (Read Only) -->
-                            <div class="col-12">
+                            <div class="col-md-6">
                                 <label class="form-label fw-semibold">
                                     <i class="bi bi-envelope-fill me-2 text-primary"></i>Email Address
                                 </label>
-                                <input type="email"
-                                       class="form-control"
-                                       th:value="${crEmail}"
-                                       readonly>
-                                <small class="text-muted">This field cannot be changed</small>
+                                <input type="email" class="form-control bg-light"
+                                       th:value="${crEmail}" readonly>
+                                <small class="text-muted">Cannot be changed</small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-card-text me-2 text-primary"></i>Roll Number
+                                </label>
+                                <input type="text" class="form-control bg-light"
+                                       name="rollNo" th:value="${crRollNo}" readonly>
+                                <small class="text-muted">Cannot be changed</small>
+                            </div>
+
+                        </div>
+
+                        <!-- ── Class Information ── -->
+                        <div class="section-divider mt-4 mb-3">
+                            <span class="fw-bold text-primary">
+                                <i class="bi bi-building me-1"></i> Class Information
+                            </span>
+                        </div>
+
+                        <div class="row g-4">
+
+                            <!-- Editable: Section -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-people-fill me-2 text-primary"></i>Section
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control"
+                                       name="section" th:value="${crSection}"
+                                       placeholder="e.g. A, B, C" required>
+                                <small class="text-warning">
+                                    <i class="bi bi-exclamation-triangle me-1"></i>
+                                    Changing this will move all your students to the new section.
+                                </small>
+                            </div>
+
+                            <!-- Editable: Semester -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-calendar2-week me-2 text-primary"></i>Semester
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" name="semester" required>
+                                    <option value="1" th:selected="${crSemester == 1}">1st Semester</option>
+                                    <option value="2" th:selected="${crSemester == 2}">2nd Semester</option>
+                                    <option value="3" th:selected="${crSemester == 3}">3rd Semester</option>
+                                    <option value="4" th:selected="${crSemester == 4}">4th Semester</option>
+                                    <option value="5" th:selected="${crSemester == 5}">5th Semester</option>
+                                    <option value="6" th:selected="${crSemester == 6}">6th Semester</option>
+                                    <option value="7" th:selected="${crSemester == 7}">7th Semester</option>
+                                    <option value="8" th:selected="${crSemester == 8}">8th Semester</option>
+                                </select>
+                                <small class="text-warning">
+                                    <i class="bi bi-exclamation-triangle me-1"></i>
+                                    Changing this will move all your students to the new semester.
+                                </small>
+                            </div>
+
+                            <!-- Readonly: Program -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-journal-bookmark me-2 text-primary"></i>Program
+                                </label>
+                                <input type="text" class="form-control bg-light"
+                                       th:value="${crProgram}" readonly>
+                                <small class="text-muted">Cannot be changed</small>
+                            </div>
+
+                            <!-- Readonly: Admission -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-calendar-check me-2 text-primary"></i>Admission
+                                </label>
+                                <input type="text" class="form-control bg-light"
+                                       th:value="${crAdmission}" readonly>
+                                <small class="text-muted">Cannot be changed</small>
+                            </div>
+
+                            <!-- Readonly: University -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-building me-2 text-primary"></i>University
+                                </label>
+                                <input type="text" class="form-control bg-light"
+                                       th:value="${crUniversity}" readonly>
+                                <small class="text-muted">Cannot be changed</small>
                             </div>
 
                         </div>
@@ -177,15 +249,5 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Trigger animations on load
-    document.addEventListener('DOMContentLoaded', () => {
-        const card = document.querySelector('.card');
-        if (card) {
-            card.style.opacity = '0';
-            card.style.animation = 'scaleIn 0.6s ease forwards';
-        }
-    });
-</script>
 </body>
 </html>

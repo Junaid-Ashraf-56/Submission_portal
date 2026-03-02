@@ -34,7 +34,10 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_STUDENT"))) {
             System.out.println("STUDENT_success");
             return "/student/dashboard";
-        }else {
+        } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+            System.out.println("Admin success");
+            return "/admin/admin-panel";
+        } else {
             System.out.println("STUDENT_failure");
             return "/auth/login";
         }

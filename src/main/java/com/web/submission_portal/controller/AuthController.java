@@ -129,6 +129,9 @@ public class AuthController {
                 System.out.println("These are the otps ");
                 System.out.println(pendingOTP);
                 System.out.println(otp);
+                log.debug("Session ID: {}", session.getId());
+                log.debug("pendingOTP: {}", session.getAttribute("pendingOTP"));
+                log.debug("flow: {}", session.getAttribute("flow"));
                 if (!otp.equals(pendingOTP)) {
                     throw new RuntimeException("Invalid OTP. Please check and try again.");
                 }
@@ -151,6 +154,9 @@ public class AuthController {
                 crAsStudent.setUniversity((String) session.getAttribute("pendingUniversity"));
                 crAsStudent.setSection((String)session.getAttribute("pendingSection"));
                 crAsStudent.setGender((Gender) session.getAttribute("pendingGender"));
+                crAsStudent.setSemester((String) session.getAttribute("pendingSemester"));
+                crAsStudent.setProgram((String) session.getAttribute("pendingProgram"));
+                crAsStudent.setAdmission((String) session.getAttribute("pendingAdmission"));
 
                 studentService.save(crAsStudent);
 
@@ -163,6 +169,9 @@ public class AuthController {
                 session.removeAttribute("pendingUniversity");
                 session.removeAttribute("pendingEmail");
                 session.removeAttribute("pendingPassword");
+                session.removeAttribute("pendingSemester");
+                session.removeAttribute("pendingProgram");
+                session.removeAttribute("pendingAdmission");
                 session.removeAttribute("resetEmail");
                 session.removeAttribute("otpSentTime");
                 session.removeAttribute("flow");

@@ -1,6 +1,8 @@
 package com.web.submission_portal.service;
 
 import com.web.submission_portal.entity.User;
+import com.web.submission_portal.enums.AccountStatus;
+import com.web.submission_portal.enums.Role;
 import com.web.submission_portal.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,9 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
+    public List<User> findByRoleAndStatus(Role role, AccountStatus status){
+        return userRepository.findAllByRoleAndStatus(role,status);
+    }
 
     @Transactional
     public User save(User user) {

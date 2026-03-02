@@ -41,8 +41,11 @@ public class RegistrationController {
             @RequestParam Gender gender,
             @RequestParam String phoneNumber,
             @RequestParam String section,
+            @RequestParam String program,
             @RequestParam String university,
+            @RequestParam String semester,
             @RequestParam String email,
+            @RequestParam String admission,
             @RequestParam String password,
             @RequestParam String confirmPassword,
             RedirectAttributes redirectAttributes,
@@ -62,6 +65,12 @@ public class RegistrationController {
             }
 
 
+            Student checkDetails = studentService.findBySemesterAndSectionAndProgramAndAdmission(semester, section, program,admission);
+            if (checkDetails!=null){
+                redirectAttributes.addFlashAttribute("errorMessage","Student in this semester,section and program already exist");
+                return "redirect:/auth/register";
+            }
+
 
             //Otp send to email for the verification of the email that it belongs to the user
             String otp = otpGeneratorService.generateOTP();
@@ -77,7 +86,9 @@ public class RegistrationController {
             session.setAttribute("pendingUniversity",university);
             session.setAttribute("pendingSection",section);
             session.setAttribute("pendingGender",gender);
-
+            session.setAttribute("pendingSemester", semester);
+            session.setAttribute("pendingProgram", program);
+            session.setAttribute("pendingAdmission", admission);
 
             session.setAttribute("resetEmail",email);
             session.setAttribute("otpSentTime",System.currentTimeMillis());

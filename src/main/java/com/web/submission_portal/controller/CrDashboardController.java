@@ -9,6 +9,7 @@ import com.web.submission_portal.repository.StudentRepository;
 import com.web.submission_portal.repository.SubmissionRepository;
 import com.web.submission_portal.repository.UserRepository;
 import com.web.submission_portal.service.AssignmentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -16,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -23,6 +25,7 @@ import java.util.List;
 @RequestMapping("/cr")
 @Controller
 @PreAuthorize("hasAuthority('ROLE_CR')")
+@RequiredArgsConstructor
 public class CrDashboardController {
     private final StudentRepository studentRepository;
     private final UserRepository  userRepository;
@@ -30,17 +33,6 @@ public class CrDashboardController {
     private final SubmissionRepository submissionRepository;
     private final AssignmentRepository assignmentRepository;
 
-    public CrDashboardController(StudentRepository studentRepository,
-                                 UserRepository userRepository,
-                                 AssignmentService assignmentService,
-                                 SubmissionRepository submissionRepository,
-                                 AssignmentRepository assignmentRepository) {
-        this.studentRepository = studentRepository;
-        this.userRepository = userRepository;
-        this.assignmentService = assignmentService;
-        this.submissionRepository = submissionRepository;
-        this.assignmentRepository = assignmentRepository;
-    }
 
     //Dashboard and profile for the cr
     @GetMapping("/dashboard")
@@ -71,9 +63,12 @@ public class CrDashboardController {
 
     //Profile editing with get and post methods
     @PostMapping("profile-info-change")
-    public String profileInfoChange(Student updatedStudent, Authentication authentication) {
-        String email = authentication.getName();
+    public String profileInfoChange(
+            Student updatedStudent,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
 
+        String email = authentication.getName();
         User user = userRepository.findByEmail(email).orElseThrow();
         Student student = studentRepository.findByUser(user).orElseThrow();
 
@@ -82,10 +77,38 @@ public class CrDashboardController {
         student.setPhoneNumber(updatedStudent.getPhoneNumber());
         student.setGender(updatedStudent.getGender());
 
+        boolean classChanged =
+                !student.getSection().equals(updatedStudent.getSection()) ||
+                        !student.getSemester().equals(updatedStudent.getSemester());
+
+        if (classChanged) {
+            List<Student> myStudents = studentRepository
+                    .getStudentsBySemesterAndSectionAndAdmissionAndProgram(
+                            student.getSection(),
+                            student.getSemester(),
+                            student.getAdmission(),
+                            student.getProgram());
+
+            myStudents.forEach(stu -> {
+                stu.setSection(updatedStudent.getSection());
+                stu.setSemester(updatedStudent.getSemester());
+                studentRepository.save(stu);
+            });
+
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Class updated. " + myStudents.size() + " student(s) moved with you.");
+        } else {
+            redirectAttributes.addFlashAttribute("successMessage", "Profile updated successfully.");
+        }
+
+        // Update CR
+        student.setSection(updatedStudent.getSection());
+        student.setSemester(updatedStudent.getSemester());
         studentRepository.save(student);
 
         return "redirect:/cr/profile?updated=true";
     }
+
     @GetMapping("/profile-info-change")
     public String handleGetOnProfileChange(Model model, Authentication authentication) {
         authenticateUser(model, authentication);

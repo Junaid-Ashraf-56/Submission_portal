@@ -33,7 +33,7 @@
         <!-- Error Message -->
         <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            <strong>Error!</strong> Invalid email or password
+            <strong>Error!</strong> Invalid email or password. If your account is pending, please wait for admin approval.
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
 
@@ -44,17 +44,12 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
 
-<!--        Disable message-->
-
-        <div th:if="${param.error}" class="alert alert-danger">
-            Invalid email or password. If your account is pending, please wait for admin approval.
-        </div>
-
         <form th:action="@{/auth/login}" method="POST">
 
             <!-- Email Address -->
             <div class="form-floating mb-3 position-relative">
-                <input type="email" class="form-control" id="floatingEmail" name="username" placeholder="name@example.com" required autofocus>
+                <input type="email" class="form-control" id="floatingEmail"
+                       name="username" placeholder="name@example.com" required autofocus>
                 <label for="floatingEmail">
                     <i class="bi bi-envelope me-2"></i>Email address
                 </label>
@@ -62,7 +57,8 @@
 
             <!-- Password -->
             <div class="form-floating mb-3 position-relative">
-                <input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Password" required>
+                <input type="password" class="form-control" id="floatingPassword"
+                       name="password" placeholder="Password" required>
                 <label for="floatingPassword">
                     <i class="bi bi-lock me-2"></i>Password
                 </label>
@@ -74,11 +70,17 @@
             </div>
 
             <!-- Login Button -->
-            <button class="btn btn-primary w-100" type="submit">
-                <i class="bi bi-box-arrow-in-right me-2"></i>
-                Sign In
+            <button class="btn btn-primary w-100 mb-2" type="submit">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
             </button>
+
         </form>
+
+        <!-- Back to Home -->
+        <a th:href="@{/}" class="btn btn-outline-secondary w-100">
+            <i class="bi bi-house-fill me-2"></i>Back to Home
+        </a>
+
     </div>
 </div>
 

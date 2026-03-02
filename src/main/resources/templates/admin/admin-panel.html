@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Assignment Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
+</head>
+<body>
+
+<!-- ────────── SIDEBAR ────────── -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon"><i class="bi bi-cloud-upload-fill"></i></div>
+        <div>
+            <div class="brand-text">Assignment Portal</div>
+            <div class="brand-sub">Admin Control Panel</div>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <span class="nav-section-label">Overview</span>
+        <button class="sidebar-link active" onclick="showTab('dashboard')">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </button>
+
+        <span class="nav-section-label">Management</span>
+        <button class="sidebar-link" onclick="showTab('cr-list')">
+            <i class="bi bi-person-badge"></i> All CRs
+        </button>
+        <button class="sidebar-link" onclick="showTab('students-list')">
+            <i class="bi bi-people-fill"></i> All Students
+        </button>
+
+        <span class="nav-section-label">Requests</span>
+        <button class="sidebar-link" onclick="showTab('cr-requests')" id="requests-sidebar-btn">
+            <i class="bi bi-person-plus-fill"></i> CR Requests
+            <span class="badge-count" th:text="${pendingCount}" th:if="${pendingCount > 0}"></span>
+        </button>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="admin-profile">
+            <div class="admin-avatar">A</div>
+            <div>
+                <div class="admin-name">Admin</div>
+                <div class="admin-role">Super Administrator</div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- ────────── MAIN ────────── -->
+<div class="main">
+
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="d-flex align-items-center gap-3">
+            <button class="sidebar-toggle-btn" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="topbar-title">
+                <h4 id="page-title">Dashboard</h4>
+                <p id="page-sub">Welcome back, Admin</p>
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" id="globalSearch"
+                       placeholder="Search CRs or students..."
+                       oninput="globalSearchFn(this.value)">
+            </div>
+            <form th:action="@{/logout}" method="POST" class="m-0">
+                <button type="submit" class="btn-logout-top">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- Flash Messages -->
+        <div th:if="${successMessage}" class="flash-alert flash-success">
+            <i class="bi bi-check-circle me-2"></i>
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="flash-alert flash-error">
+            <i class="bi bi-exclamation-circle me-2"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             TAB 1: DASHBOARD
+        ════════════════════════════════════════ -->
+        <div class="tab-section active" id="tab-dashboard">
+
+            <!-- Stat cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="bi bi-person-badge-fill"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-value" th:text="${totalCRs}">0</div>
+                            <div class="stat-label">Total CRs</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="bi bi-people-fill"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-value" th:text="${totalStudents}">0</div>
+                            <div class="stat-label">Total Students</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon orange"><i class="bi bi-hourglass-split"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-value" th:text="${pendingCount}">0</div>
+                            <div class="stat-label">Pending Requests</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="bi bi-journal-text"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-value" th:text="${totalAssignments}">0</div>
+                            <div class="stat-label">Assignments</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending requests preview (max 5) -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h5><i class="bi bi-bell-fill"></i> Pending CR Requests</h5>
+                    <button class="btn-action btn-view" onclick="showTab('cr-requests')">
+                        View All <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+
+                <div th:if="${pendingRequests != null and !pendingRequests.isEmpty()}">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>University</th>
+                            <th>Requested</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="req, s : ${pendingRequests}" th:if="${s.index < 5}">
+                            <td>
+                                <div class="user-cell">
+                                    <div class="user-avatar avatar-orange"
+                                         th:text="${req.name.substring(0,1)}">A</div>
+                                    <div>
+                                        <div class="user-name" th:text="${req.name}">Name</div>
+                                        <div class="user-sub"  th:text="${req.rollNo}">Roll</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td th:text="${req.user.email}"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a5c0c8c4ccc9e5c0dd8bc6cac8">[email&#160;protected]</a></td>
+                            <td th:text="${req.university}">University</td>
+                            <td th:text="${#temporals.format(req.user.createdAt,'dd MMM yyyy')}">01 Jan 2026</td>
+                            <td>
+                                <!-- Approve -->
+                                <form th:action="@{/admin/cr/approve}" method="POST" style="display:inline">
+                                    <input type="hidden" name="email" th:value="${req.user.email}">
+                                    <button type="submit" class="btn-action btn-approve">
+                                        <i class="bi bi-check-lg"></i> Approve
+                                    </button>
+                                </form>
+                                <!-- Reject -->
+                                <form th:action="@{/admin/cr/reject}" method="POST" style="display:inline">
+                                    <input type="hidden" name="email" th:value="${req.user.email}">
+                                    <button type="submit" class="btn-action btn-reject ms-1"
+                                            onclick="return confirm('Reject this CR request?')">
+                                        <i class="bi bi-x-lg"></i> Reject
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:if="${pendingRequests == null or pendingRequests.isEmpty()}" class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <p>No pending CR registration requests.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             TAB 2: ALL CRs
+        ════════════════════════════════════════ -->
+        <div class="tab-section" id="tab-cr-list">
+            <div class="panel">
+                <div class="panel-header">
+                    <h5><i class="bi bi-person-badge-fill"></i> All Class Representatives</h5>
+                    <div class="panel-search">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="crSearch" placeholder="Search CRs..."
+                               oninput="searchTable('crSearch','crTableBody')">
+                    </div>
+                </div>
+
+                <div th:if="${crs != null and !crs.isEmpty()}">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>CR</th>
+                            <th>Roll No</th>
+                            <th>Section</th>
+                            <th>University</th>
+                            <th>Email</th>
+                            <th>Gender</th>
+                            <th>Students</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody id="crTableBody">
+                        <th:block th:each="cr, stat : ${crs}">
+
+                            <!-- CR row -->
+                            <tr>
+                                <td style="width:40px;">
+                                    <button class="cr-expand-btn"
+                                            onclick="toggleCRStudents(this, 'cr-students-[[${stat.index}]]')">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </button>
+                                </td>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar avatar-blue"
+                                             th:text="${cr.name.substring(0,1)}">C</div>
+                                        <div>
+                                            <div class="user-name" th:text="${cr.name}">CR Name</div>
+                                            <div class="user-sub">Class Representative</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td th:text="${cr.rollNo}">sp24-bse-000</td>
+                                <td th:text="${cr.section}">A</td>
+                                <td th:text="${cr.university}">University</td>
+                                <td th:text="${cr.user.email}"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f1949c90989db19489df929e9c">[email&#160;protected]</a></td>
+                                <td>
+                                        <span class="badge-status"
+                                              th:classappend="${cr.gender.name() == 'MALE'} ? 'badge-male' : 'badge-female'"
+                                              th:text="${cr.gender}">MALE</span>
+                                </td>
+                                <td>
+                                        <span class="badge-status badge-active"
+                                              th:text="${cr.studentCount != null ? cr.studentCount : '—'}">5</span>
+                                </td>
+                                <td>
+                                    <form th:action="@{/admin/cr/delete}" method="POST"
+                                          onsubmit="return confirm('Delete this CR and all their data?')">
+                                        <!-- email used as identifier -->
+                                        <input type="hidden" name="email" th:value="${cr.user.email}">
+                                        <button type="submit" class="btn-action btn-delete-sm">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+
+                            <!-- Expandable students sub-table -->
+                            <tr class="cr-students-row">
+                                <td colspan="9">
+                                    <div class="cr-students-inner" th:id="'cr-students-' + ${stat.index}">
+                                        <table class="data-table">
+                                            <thead>
+                                            <tr>
+                                                <th>Student Name</th>
+                                                <th>Roll No</th>
+                                                <th>Email</th>
+                                                <th>Phone</th>
+                                                <th>Gender</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="stu : ${cr.students}"
+                                                th:if="${cr.students != null}">
+                                                <td>
+                                                    <div class="user-cell">
+                                                        <div class="user-avatar avatar-green"
+                                                             th:text="${stu.name.substring(0,1)}">S</div>
+                                                        <div class="user-name" th:text="${stu.name}">Student</div>
+                                                    </div>
+                                                </td>
+                                                <td th:text="${stu.rollNo}">sp24-bse-001</td>
+                                                <td th:text="${stu.user.email}"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8cfff8f9cce9f4a2efe3e1">[email&#160;protected]</a></td>
+                                                <td th:text="${stu.phoneNumber != null ? stu.phoneNumber : '—'}">—</td>
+                                                <td>
+                                                            <span class="badge-status"
+                                                                  th:classappend="${stu.gender.name() == 'MALE'} ? 'badge-male' : 'badge-female'"
+                                                                  th:text="${stu.gender}">MALE</span>
+                                                </td>
+                                            </tr>
+                                            <tr th:if="${cr.students == null or cr.students.isEmpty()}">
+                                                <td colspan="5" class="text-center"
+                                                    style="color:rgba(255,255,255,0.3); padding:1rem;">
+                                                    No students added yet.
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        </th:block>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:if="${crs == null or crs.isEmpty()}" class="empty-state">
+                    <i class="bi bi-person-x"></i>
+                    <p>No approved CRs found.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             TAB 3: ALL STUDENTS
+        ════════════════════════════════════════ -->
+        <div class="tab-section" id="tab-students-list">
+            <div class="panel">
+                <div class="panel-header">
+                    <h5><i class="bi bi-people-fill"></i> All Students</h5>
+                    <div class="panel-search">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="stuSearch" placeholder="Search students..."
+                               oninput="searchTable('stuSearch','stuTableBody')">
+                    </div>
+                </div>
+
+                <div th:if="${allStudents != null and !allStudents.isEmpty()}">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Roll No</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Section</th>
+                            <th>University</th>
+                            <th>Gender</th>
+                            <th>CR</th>
+                        </tr>
+                        </thead>
+                        <tbody id="stuTableBody">
+                        <tr th:each="stu : ${allStudents}">
+                            <td>
+                                <div class="user-cell">
+                                    <div class="user-avatar avatar-green"
+                                         th:text="${stu.name.substring(0,1)}">S</div>
+                                    <div class="user-name" th:text="${stu.name}">Student</div>
+                                </div>
+                            </td>
+                            <td th:text="${stu.rollNo}">sp24-bse-001</td>
+                            <td th:text="${stu.user.email}"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="116265645174693f727e7c">[email&#160;protected]</a></td>
+                            <td th:text="${stu.phoneNumber != null ? stu.phoneNumber : '—'}">—</td>
+                            <td th:text="${stu.section}">A</td>
+                            <td th:text="${stu.university}">University</td>
+                            <td>
+                                    <span class="badge-status"
+                                          th:classappend="${stu.gender.name() == 'MALE'} ? 'badge-male' : 'badge-female'"
+                                          th:text="${stu.gender}">MALE</span>
+                            </td>
+                            <td th:text="${stu.crName != null ? stu.crName : '—'}">CR Name</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:if="${allStudents == null or allStudents.isEmpty()}" class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <p>No students found.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             TAB 4: CR REQUESTS
+        ════════════════════════════════════════ -->
+        <div class="tab-section" id="tab-cr-requests">
+            <div class="panel">
+                <div class="panel-header">
+                    <h5><i class="bi bi-person-plus-fill"></i> CR Registration Requests</h5>
+                    <div class="panel-search">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="reqSearch" placeholder="Search requests..."
+                               oninput="searchTable('reqSearch','reqTableBody')">
+                    </div>
+                </div>
+
+                <div th:if="${pendingRequests != null and !pendingRequests.isEmpty()}">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Applicant</th>
+                            <th>Roll No</th>
+                            <th>Email</th>
+                            <th>Section</th>
+                            <th>University</th>
+                            <th>Phone</th>
+                            <th>Gender</th>
+                            <th>Requested On</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="reqTableBody">
+                        <tr th:each="req : ${pendingRequests}">
+                            <td>
+                                <div class="user-cell">
+                                    <div class="user-avatar avatar-orange"
+                                         th:text="${req.name.substring(0,1)}">A</div>
+                                    <div>
+                                        <div class="user-name" th:text="${req.name}">Name</div>
+                                        <div class="user-sub">Awaiting approval</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td th:text="${req.rollNo}">sp24-bse-051</td>
+                            <td th:text="${req.user.email}"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="51322311243f387f343524">[email&#160;protected]</a></td>
+                            <td th:text="${req.section}">A</td>
+                            <td th:text="${req.university}">University</td>
+                            <td th:text="${req.phoneNumber != null ? req.phoneNumber : '—'}">—</td>
+                            <td>
+                                    <span class="badge-status"
+                                          th:classappend="${req.gender.name() == 'MALE'} ? 'badge-male' : 'badge-female'"
+                                          th:text="${req.gender}">MALE</span>
+                            </td>
+                            <td th:text="${#temporals.format(req.user.createdAt,'dd MMM yyyy')}">01 Jan 2026</td>
+                            <td>
+                                <div class="d-flex gap-1 flex-wrap">
+                                    <!-- Approve — passes email -->
+                                    <form th:action="@{/admin/cr/approve}" method="POST">
+                                        <input type="hidden" name="email" th:value="${req.user.email}">
+                                        <button type="submit" class="btn-action btn-approve">
+                                            <i class="bi bi-check-lg"></i> Approve
+                                        </button>
+                                    </form>
+                                    <!-- Reject — passes email -->
+                                    <form th:action="@{/admin/cr/reject}" method="POST">
+                                        <input type="hidden" name="email" th:value="${req.user.email}">
+                                        <button type="submit" class="btn-action btn-reject"
+                                                onclick="return confirm('Reject this CR request?')">
+                                            <i class="bi bi-x-lg"></i> Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:if="${pendingRequests == null or pendingRequests.isEmpty()}" class="empty-state">
+                    <i class="bi bi-check2-circle"></i>
+                    <p>All caught up! No pending CR registration requests.</p>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /content -->
+</div><!-- /main -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/admin-panel.js}"></script>
+</body>
+</html>

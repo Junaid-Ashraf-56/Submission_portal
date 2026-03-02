@@ -1,6 +1,8 @@
 package com.web.submission_portal.service;
 
 import com.web.submission_portal.entity.Student;
+import com.web.submission_portal.enums.AccountStatus;
+import com.web.submission_portal.enums.Role;
 import com.web.submission_portal.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,11 +20,9 @@ public class StudentService {
         return studentRepository.findBySection(section);
     }
 
-
     public Student findByUserId(Long userId) {
         return studentRepository.findByUserUserId(userId);
     }
-
 
     public boolean existsByRollNo(String rollNo) {
         return studentRepository.existsByRollNo(rollNo);
@@ -44,5 +44,26 @@ public class StudentService {
 
     public Student getByRollNo(String rollNo){
         return studentRepository.findByRollNo(rollNo);
+    }
+    public List<Student> findAllStudents(){
+        return studentRepository.findAll();
+    }
+    public int countStudentsBySectionAndUniversity(String section,String university){
+        return studentRepository.countBySectionAndUniversity(section,university);
+    }
+
+    public List<Student> findBySectionAndUniversity(String section,String university){
+        return studentRepository.findBySectionAndUniversity(section,university);
+    }
+    public List<Student> findByRoleAndStatus(Role role, AccountStatus accountStatus){
+        return studentRepository.findStudentsByUserRoleAndStatus(role,accountStatus);
+    }
+
+    public Student findCRBySectionAndUniversity(String section,String university,Role role){
+        return studentRepository.findCRBySectionAndUniversity(section,university,role);
+    }
+
+    public Student findBySemesterAndSectionAndProgramAndAdmission(String semester,String section,String program,String admission){
+        return studentRepository.getStudentsBySemesterAndSectionAndProgramAndAdmission(semester,section,program,admission);
     }
 }
