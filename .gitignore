@@ -32,8 +32,8 @@ build/
 ### VS Code ###
 .vscode/
 
-
-#Supbase
+### Secrets ###
 application.properties
+docker-compose.yml
 .env
 *.env
