@@ -33,7 +33,5 @@ build/
 .vscode/
 
 ### Secrets ###
-application.properties
-docker-compose.yml
 .env
 *.env

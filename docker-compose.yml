@@ -1,0 +1,44 @@
+services:
+
+  app:
+    build: .
+    container_name: submission_portal_app
+    ports:
+      - "8080:8080"
+    environment:
+      # Database — points to the db service below, NOT localhost
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/submission_portal
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234
+
+      # Supabase storage
+      SUPABASE_URL: https://oqarxoqstbuioyjdvycg.storage.supabase.co
+      SUPABASE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xYXJ4b3FzdGJ1aW95amR2eWNnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTI3NjY1NCwiZXhwIjoyMDgwODUyNjU0fQ.OOwfSqnwV2UfxZG4uDdrYt0OctYdYYTQM8kkaEtxduI
+      SUPABASE_BUCKET_NAME: Submission
+
+      # Gmail SMTP
+      MAIL_USERNAME: "submissionportal.cr@gmail.com"
+      MAIL_PASSWORD: "eqmv peqy wnvu ydpk"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    container_name: submission_portal_db
+    environment:
+      POSTGRES_DB: submission_portal
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pgdata:
