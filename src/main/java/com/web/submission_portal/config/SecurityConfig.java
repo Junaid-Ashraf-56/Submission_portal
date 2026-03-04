@@ -28,6 +28,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**","/js/**","/").permitAll()
                         .requestMatchers("/auth/**","/contact","/","/auth/register").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/chat/**").authenticated()
                         .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/cr/**").hasAuthority("ROLE_CR")
                         .requestMatchers("/student/**").hasAnyAuthority("ROLE_STUDENT","ROLE_CR")

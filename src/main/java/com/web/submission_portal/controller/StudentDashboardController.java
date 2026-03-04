@@ -53,7 +53,10 @@ public class StudentDashboardController {
         //These for the assignment submitted by the student
         List<Assignment> assignments = assignmentRepository.findAssignmentsForSection(student.getSection());
         model.addAttribute("assignments", assignments);
-
+        model.addAttribute("studentSection",   student.getSection());
+        model.addAttribute("studentProgram",   student.getProgram());
+        model.addAttribute("studentSemester",  student.getSemester());
+        model.addAttribute("studentAdmission", student.getAdmission());
 
         //This is for the submission of the student
         Map<Long,Boolean> submissionStatus = new HashMap<>();

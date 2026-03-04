@@ -10,21 +10,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <link rel="stylesheet" th:href="@{/css/student-dashboard.css}">
 </head>
 <body>
 
-<!-- Navbar -->
 <div class="container">
     <nav class="navbar navbar-expand-lg navbar-floating">
         <div class="container-fluid">
             <a class="navbar-brand" th:href="@{/student/dashboard}">
                 <i class="bi bi-cloud-upload-fill me-2"></i> Assignment Portal
             </a>
-
             <button class="navbar-toggler border-0 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-2">
                     <li class="nav-item">
@@ -38,7 +36,6 @@
                         </a>
                     </li>
                 </ul>
-
                 <div class="d-flex align-items-center gap-3">
                     <span class="text-white fw-semibold" th:text="${studentName}">Student</span>
                     <form th:action="@{/logout}" method="POST" class="m-0">
@@ -52,16 +49,12 @@
     </nav>
 </div>
 
-<!-- Main Content -->
 <div class="container my-5">
-
-    <!-- Welcome Section -->
     <div class="mb-5 animate-fadeIn">
         <h1 class="fw-bold text-gradient mb-2">Welcome back, <span th:text="${studentName}">Student</span>!</h1>
         <p class="text-muted fs-5"><i class="bi bi-mortarboard me-2"></i><span th:text="${studentRollNo}">Roll No</span></p>
     </div>
 
-    <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-4 animate-slideInLeft">
         <h3 class="fw-bold mb-0">
             <i class="bi bi-journal-check me-2 text-primary"></i>Active Assignments
@@ -69,21 +62,16 @@
         <span class="badge bg-primary" th:text="${#lists.size(assignments)} + ' Total'">0 Total</span>
     </div>
 
-    <!-- Empty State -->
     <div th:if="${#lists.isEmpty(assignments)}" class="text-center py-5 animate-scaleIn">
-        <div class="mb-4">
-            <i class="bi bi-inbox display-1 text-muted" style="opacity: 0.3;"></i>
-        </div>
+        <div class="mb-4"><i class="bi bi-inbox display-1 text-muted" style="opacity: 0.3;"></i></div>
         <h4 class="fw-bold text-muted">No Active Assignments</h4>
         <p class="text-muted">You're all caught up! Check back later for new assignments.</p>
     </div>
 
-    <!-- Assignment Cards -->
     <div th:unless="${#lists.isEmpty(assignments)}" class="row g-4">
         <div th:each="assignment, iterStat : ${assignments}" class="col-md-6 col-lg-4">
             <div class="card assignment-card h-100 animate-fadeIn hover-lift">
                 <div class="card-body">
-                    <!-- Type & Status Row -->
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <span class="badge"
                               th:classappend="${assignment.assignmentType.name() == 'LAB'} ? 'bg-info' : 'bg-primary'"
@@ -92,37 +80,23 @@
                               th:classappend="${assignment.endTime.isAfter(T(java.time.LocalDateTime).now())} ? 'bg-success' : 'bg-secondary'"
                               th:text="${assignment.endTime.isAfter(T(java.time.LocalDateTime).now())} ? 'Active' : 'Closed'">Active</span>
                     </div>
-
-                    <!-- Title & Code -->
                     <h5 class="card-title fw-bold mb-1" th:text="${assignment.subjectTitle}">Subject</h5>
                     <p class="text-muted small mb-3" th:text="${assignment.subjectCode}">Code</p>
-
-                    <!-- Deadline -->
                     <div class="d-flex align-items-center text-muted small mb-3">
                         <i class="bi bi-clock me-2"></i>
                         <span th:text="'Due: ' + ${#temporals.format(assignment.endTime, 'MMM dd, HH:mm')}">Deadline</span>
                     </div>
-
-                    <!-- Description -->
                     <p class="card-text small text-muted mb-3"
-                       th:text="${#strings.abbreviate(assignment.description, 80)}">
-                        Description...
-                    </p>
-
-                    <!-- Submission Status Badge -->
+                       th:text="${#strings.abbreviate(assignment.description, 80)}">Description...</p>
                     <div class="mb-3">
-                        <span th:if="${submissionStatus.get(assignment.assignmentId)}"
-                              class="badge bg-success">
+                        <span th:if="${submissionStatus.get(assignment.assignmentId)}" class="badge bg-success">
                             <i class="bi bi-check-circle-fill me-1"></i>Submitted
                         </span>
-                        <span th:unless="${submissionStatus.get(assignment.assignmentId)}"
-                              class="badge bg-warning text-dark">
+                        <span th:unless="${submissionStatus.get(assignment.assignmentId)}" class="badge bg-warning text-dark">
                             <i class="bi bi-exclamation-circle me-1"></i>Pending
                         </span>
                     </div>
                 </div>
-
-                <!-- Card Footer -->
                 <div class="card-footer">
                     <a th:if="${!submissionStatus.get(assignment.assignmentId)}"
                        th:href="@{/student/assignments/{id}/submit(id=${assignment.assignmentId})}"
@@ -140,12 +114,174 @@
     </div>
 </div>
 
+<!-- ═══════ CHAT BUBBLE ═══════ -->
+<button class="chat-bubble" onclick="toggleChat()" title="Class Chat">
+    <i class="bi bi-chat-dots-fill" id="chatBubbleIcon"></i>
+    <span class="chat-unread d-none" id="unreadBadge">0</span>
+</button>
+
+<!-- ═══════ CHAT PANEL ═══════ -->
+<div class="chat-panel" id="chatPanel">
+    <div class="chat-panel-header">
+        <div>
+            <div class="chat-title">
+                <span class="chat-online-dot"></span>
+                Class Chat
+            </div>
+            <div class="chat-subtitle"
+                 th:text="${studentSection} + ' · ' + ${studentProgram} + ' · Sem ' + ${studentSemester}">
+                Section A · BSE · Sem 4
+            </div>
+        </div>
+        <button class="btn-chat-close" onclick="toggleChat()">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+        <div class="msg-system">Messages are visible to your class only</div>
+    </div>
+
+    <div class="chat-input-area">
+        <input class="chat-input" id="chatInput" type="text"
+               placeholder="Message your class..."
+               maxlength="500"
+               onkeydown="if(event.key==='Enter') sendMessage()">
+        <button class="btn-send" id="sendBtn" onclick="sendMessage()" disabled>
+            <i class="bi bi-send-fill" style="font-size:0.8rem;"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Hidden room/sender info injected by Thymeleaf -->
+<span id="roomId"
+      th:text="${studentAdmission + '-' + studentProgram + '-' + studentSection + '-' + studentSemester}"
+      style="display:none"></span>
+<span id="senderName" th:text="${studentName}" style="display:none"></span>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
 <script>
-    // Trigger animations on load
+    let chatOpen    = false;
+    let stompClient = null;
+    let connected   = false;
+    let unread      = 0;
+
+    const roomId     = document.getElementById('roomId').textContent.trim();
+    const senderName = document.getElementById('senderName').textContent.trim();
+
+    function toggleChat() {
+        chatOpen = !chatOpen;
+        document.getElementById('chatPanel').classList.toggle('open', chatOpen);
+        document.getElementById('chatBubbleIcon').className =
+            chatOpen ? 'bi bi-x-lg' : 'bi bi-chat-dots-fill';
+
+        if (chatOpen) {
+            resetUnread();
+            scrollToBottom();
+            document.getElementById('chatInput').focus();
+            if (!connected) connectWebSocket();
+        }
+    }
+
+
+    function onMessageReceived(payload) {
+        const msg    = JSON.parse(payload.body);
+        const isMine = msg.senderName === senderName;
+        appendMessage(msg.senderName, msg.content, msg.sentAt, isMine);
+        if (!chatOpen) bumpUnread();
+    }
+
+    function connectWebSocket() {
+        const socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
+        stompClient.debug = null; // silence noisy STOMP logs
+
+        stompClient.connect({}, () => {
+            connected = true;
+            appendSystemMessage('Connected to class chat');
+            document.getElementById('sendBtn').disabled = false;
+            stompClient.subscribe('/topic/chat/' + roomId, onMessageReceived);
+            loadHistory();
+        }, (error) => {
+            // connection failed
+            appendSystemMessage('Connection failed — retrying...');
+            setTimeout(connectWebSocket, 3000); // retry after 3s
+        });
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const text  = input.value.trim();
+        if (!text || !connected) return;
+
+        // sends to Spring @MessageMapping("/chat/{roomId}")
+        stompClient.send('/app/chat/' + roomId, {}, JSON.stringify({
+            content: text
+        }));
+
+        input.value = '';
+        input.focus();
+    }
+
+    function loadHistory() {
+        fetch('/chat/' + roomId + '/history')
+            .then(r => r.json())
+            .then(msgs => msgs.forEach(m =>
+                appendMessage(m.senderName, m.content, m.sentAt, m.senderName === senderName)
+            ));
+    }
+
+    function appendMessage(sender, text, time, isMine) {
+        const container = document.getElementById('chatMessages');
+        const timeStr   = time ? new Date(time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
+        const div       = document.createElement('div');
+        div.className   = 'msg ' + (isMine ? 'sent' : 'received');
+        div.innerHTML   = `
+            ${!isMine ? `<div class="msg-sender">${escHtml(sender)}</div>` : ''}
+            <div class="msg-bubble">${escHtml(text)}</div>
+            <div class="msg-time">${timeStr}</div>`;
+        container.appendChild(div);
+        scrollToBottom();
+    }
+
+    function appendSystemMessage(text) {
+        const div     = document.createElement('div');
+        div.className = 'msg-system';
+        div.textContent = text;
+        document.getElementById('chatMessages').appendChild(div);
+        scrollToBottom();
+    }
+
+    function scrollToBottom() {
+        const el = document.getElementById('chatMessages');
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function bumpUnread() {
+        unread++;
+        const badge = document.getElementById('unreadBadge');
+        badge.textContent = unread;
+        badge.classList.remove('d-none');
+    }
+
+    function resetUnread() {
+        unread = 0;
+        document.getElementById('unreadBadge').classList.add('d-none');
+    }
+
+    function escHtml(str) {
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    document.getElementById('chatInput').addEventListener('input', function() {
+        document.getElementById('sendBtn').disabled = !this.value.trim();
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
-        const cards = document.querySelectorAll('.card');
-        cards.forEach(card => {
+        document.querySelectorAll('.card').forEach(card => {
             card.style.opacity = '0';
             card.style.animation = 'fadeIn 0.6s ease forwards';
         });

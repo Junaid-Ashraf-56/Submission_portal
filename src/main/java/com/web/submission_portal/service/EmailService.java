@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
@@ -29,6 +30,7 @@ public class EmailService {
 
     private static final int EMAIL_TIMEOUT_SECONDS = 20;
 
+    @Async
     public void sendOTPEmail(String toEmail, String otp) {
         String subject = "Password Reset OTP - Assignment Portal";
         String htmlContent = buildOTPEmailTemplate(otp);

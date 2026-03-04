@@ -50,7 +50,10 @@ public class CrDashboardController {
         //These for the assignment submitted by the cr as student
         List<Assignment> assignments = assignmentRepository.findAssignmentsForSection(student.getSection());
         model.addAttribute("assignments", assignments);
-
+        model.addAttribute("crSection",   student.getSection());
+        model.addAttribute("crProgram",   student.getProgram());
+        model.addAttribute("crSemester",  student.getSemester());
+        model.addAttribute("crAdmission", student.getAdmission());
 
         return "cr/dashboard";
     }
