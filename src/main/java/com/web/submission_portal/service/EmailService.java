@@ -25,7 +25,7 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final EmailLogsRepository emailLogsRepository;
 
-    @Value("${spring.mail.username}")
+    @Value("${mail.from}")
     private String fromEmail;
 
     private static final int EMAIL_TIMEOUT_SECONDS = 20;
@@ -261,7 +261,7 @@ public class EmailService {
                         </div>
                        \s
                         <p style="text-align: center; margin-top: 30px;">
-                            <a href="http://localhost:8080/login" style="background-color: #4F46E5; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">Login Now</a>
+                            <a href="https://assignmentportal.live/auth/login" style="background-color: #4F46E5; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">Login Now</a>
                         </p>
                        \s
                         <p>Best regards,<br><strong>Assignment Portal Team</strong></p>
