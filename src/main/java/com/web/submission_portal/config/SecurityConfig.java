@@ -36,6 +36,9 @@ public class SecurityConfig {
                         .requestMatchers("/student/**").hasAnyAuthority("ROLE_STUDENT","ROLE_CR")
                         .anyRequest().authenticated()
                 )
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/ws/**")
+                )
                 .formLogin(form->form
                         .loginPage("/auth/login")
                         .loginProcessingUrl("/auth/login")
