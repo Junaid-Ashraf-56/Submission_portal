@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .requestMatchers("/css/**","/js/**","/").permitAll()
                         .requestMatchers("/auth/**","/contact","/","/auth/register").permitAll()
                         .requestMatchers("/ws/**").permitAll()
+			.requestMatchers("/favicon.ico","/error").permitAll()
                         .requestMatchers("/chat/**").authenticated()
                         .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/cr/**").hasAuthority("ROLE_CR")
@@ -50,6 +51,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .sessionManagement(session ->session
+			.sessionFixation().migrateSession()
                         .maximumSessions(1)
                         .maxSessionsPreventsLogin(false)
                 )

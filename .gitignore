@@ -33,5 +33,7 @@ build/
 .vscode/
 
 ### Secrets ###
-.env
+*.pub
+*.save
+submission_portal
 *.env
