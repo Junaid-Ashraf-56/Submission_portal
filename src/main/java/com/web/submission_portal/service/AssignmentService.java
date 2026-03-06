@@ -1,6 +1,7 @@
 package com.web.submission_portal.service;
 
 import com.web.submission_portal.entity.Assignment;
+import com.web.submission_portal.entity.Student;
 import com.web.submission_portal.entity.User;
 import com.web.submission_portal.repository.AssignmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,5 +38,9 @@ public class AssignmentService {
 
     public void deleteById(long assignmentId){
         assignmentRepository.deleteById(assignmentId);
+    }
+
+    public void deleteByCreatedBy(User user) {
+        return assignmentRepository.deleteByCreatedBy(user);
     }
 }

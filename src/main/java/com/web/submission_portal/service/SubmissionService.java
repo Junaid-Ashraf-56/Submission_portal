@@ -21,17 +21,6 @@ public class SubmissionService {
     }
 
 
-    public Submission findById(Long id) {
-        return submissionRepository.findById(id).orElse(null);
-    }
-
-    public boolean existsByAssignmentAndStudent(Assignment assignment, Student student) {
-        return submissionRepository.existsByStudentAndAssignment(student,assignment);
-    }
-
-    public long countByAssignment(Assignment assignment) {
-        return submissionRepository.countByAssignment(assignment);
-    }
 
     @Transactional
     public Submission save(Submission submission) {
@@ -43,4 +32,7 @@ public class SubmissionService {
         submissionRepository.deleteById(id);
     }
 
+    public void deleteByAssignment(Assignment assignment) {
+        submissionRepository.deleteByAssignment(assignment);
+    }
 }

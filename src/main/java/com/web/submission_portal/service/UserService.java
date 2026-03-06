@@ -20,7 +20,6 @@ public class UserService {
         return userRepository.findByEmail(email).orElse(null);
     }
 
-
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
@@ -37,5 +36,9 @@ public class UserService {
     @Transactional
     public void deleteById(Long id) {
         userRepository.deleteById(id);
+    }
+
+    public User findByUserId(Long userId) {
+        return userRepository.findByUserId(userId);
     }
 }

@@ -5,6 +5,7 @@ import com.web.submission_portal.enums.AccountStatus;
 import com.web.submission_portal.enums.Gender;
 import com.web.submission_portal.enums.Role;
 import com.web.submission_portal.service.*;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/cr")
@@ -26,12 +28,19 @@ public class CRController {
     private final UserService userService;
     private final SubmissionService submissionService;
     private final PasswordEncoder passwordEncoder;
+    private final ChatService chatService;
 
     @GetMapping("/manage-students")
     public String manageStudentsPage(Model model, Authentication auth) {
         User crUser = userService.findByEmail(auth.getName());
+        if (crUser==null){
+            return "auth/login";
+        }
         Student student = studentService.getByUserId(crUser.getUserId());
-        List<Student> students = studentService.getStudentBySection(student.getSection());
+        List<Student> students = studentService.getStudentBySection(student.getSection())
+                .stream()
+                .filter(s -> s.getUser().getRole() == Role.ROLE_STUDENT)
+                .collect(Collectors.toList());
 
         model.addAttribute("crName", student.getName());
         model.addAttribute("students", students);
@@ -150,6 +159,7 @@ public class CRController {
                 submissionService.deleteById(submission.getSubmissionId());
             }
             Long studentId = student.getStudentId();
+            assignmentService.deleteByCreatedBy(userService.findByUserId(userId));
             studentService.deleteById(studentId);
 
             userService.deleteById(userId);
@@ -164,7 +174,6 @@ public class CRController {
             return "redirect:/cr/manage-students?error";
         }
     }
-
     //From here assignment is managed by the student
 
     @GetMapping("/manage-assignments")
@@ -237,6 +246,67 @@ public class CRController {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Failed to update assignment: " + e.getMessage());
             return "redirect:/cr/manage-assignments?error";
+        }
+    }
+
+    @PostMapping("/delete-account")
+    public String deleteCRAccount(Authentication auth,
+                                  RedirectAttributes redirectAttributes,
+                                  HttpSession session) {
+        try {
+            User crUser = userService.findByEmail(auth.getName());
+            Student crStudent = studentService.findByUserId(crUser.getUserId());
+
+            if (crStudent == null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "CR profile not found!");
+                return "redirect:/cr/profile?error";
+            }
+
+            // 1. Get all ROLE_STUDENT students in this CR's section
+            List<Student> students = studentService.getStudentBySection(crStudent.getSection())
+                    .stream()
+                    .filter(s -> s.getUser().getRole() == Role.ROLE_STUDENT)
+                    .collect(Collectors.toList());
+
+            // 2. Delete each student's submissions → student record → user account
+            for (Student student : students) {
+                List<Submission> subs = submissionService.findByStudent(student);
+                subs.forEach(s -> submissionService.deleteById(s.getSubmissionId()));
+                Long studentId = student.getStudentId();
+                Long userId = student.getUser().getUserId();
+                studentService.deleteById(studentId);
+                userService.deleteById(userId);
+            }
+
+            // 3. Delete submissions for all CR's assignments, then the assignments
+            List<Assignment> assignments = assignmentService.getAssignmentsByCreator(crUser);
+            for (Assignment assignment : assignments) {
+                submissionService.deleteByAssignment(assignment);
+                assignmentService.deleteById(assignment.getAssignmentId());
+            }
+
+            // 4. Delete chat messages for this class room
+            String roomId = crStudent.getAdmission() + "-" +
+                    crStudent.getProgram() + "-" +
+                    crStudent.getSection() + "-" +
+                    crStudent.getSemester();
+            chatService.deleteByRoomId(roomId);
+
+            // 5. Delete CR student record and user account
+            Long crStudentId = crStudent.getStudentId();
+            Long crUserId = crUser.getUserId();
+            studentService.deleteById(crStudentId);
+            userService.deleteById(crUserId);
+
+            // 6. Invalidate session so they are logged out
+            session.invalidate();
+
+            return "redirect:/auth/login?accountDeleted";
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Failed to delete account: " + e.getMessage());
+            return "redirect:/cr/profile?error";
         }
     }
 }

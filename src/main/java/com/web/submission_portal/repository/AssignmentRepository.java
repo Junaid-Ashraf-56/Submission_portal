@@ -1,6 +1,7 @@
 package com.web.submission_portal.repository;
 
 import com.web.submission_portal.entity.Assignment;
+import com.web.submission_portal.entity.Student;
 import com.web.submission_portal.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +15,7 @@ import java.util.Optional;
 @Repository
 public interface AssignmentRepository extends JpaRepository<Assignment,Long> {
     Optional<Assignment> findByAssignmentId(Long assignmentId);
+    void deleteByCreatedBy(User user);
     Assignment findFirstByAssignmentId(Long assignmentId);
     List<Assignment> findByCreatedBy(User user);
     @Query("SELECT a FROM Assignment a " +
