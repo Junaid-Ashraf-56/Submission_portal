@@ -4,6 +4,7 @@ import com.web.submission_portal.entity.*;
 import com.web.submission_portal.enums.AccountStatus;
 import com.web.submission_portal.enums.Gender;
 import com.web.submission_portal.enums.Role;
+import com.web.submission_portal.repository.ChatMessageRepository;
 import com.web.submission_portal.service.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class CRController {
     private final UserService userService;
     private final SubmissionService submissionService;
     private final PasswordEncoder passwordEncoder;
-    private final ChatService chatService;
+    private final ChatMessageRepository chatMessageRepository;
 
     @GetMapping("/manage-students")
     public String manageStudentsPage(Model model, Authentication auth) {
@@ -290,7 +291,7 @@ public class CRController {
                     crStudent.getProgram() + "-" +
                     crStudent.getSection() + "-" +
                     crStudent.getSemester();
-            chatService.deleteByRoomId(roomId);
+                    chatMessageRepository.deleteByRoomId(roomId);
 
             // 5. Delete CR student record and user account
             Long crStudentId = crStudent.getStudentId();
