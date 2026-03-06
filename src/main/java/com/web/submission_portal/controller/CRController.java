@@ -267,7 +267,7 @@ public class CRController {
             List<Student> students = studentService.getStudentBySection(crStudent.getSection())
                     .stream()
                     .filter(s -> s.getUser().getRole() == Role.ROLE_STUDENT)
-                    .collect(Collectors.toList());
+                    .toList();
 
             // 2. Delete each student's submissions → student record → user account
             for (Student student : students) {

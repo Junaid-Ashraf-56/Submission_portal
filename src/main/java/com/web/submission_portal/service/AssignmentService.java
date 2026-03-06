@@ -41,6 +41,6 @@ public class AssignmentService {
     }
 
     public void deleteByCreatedBy(User user) {
-        return assignmentRepository.deleteByCreatedBy(user);
+        assignmentRepository.deleteByCreatedBy(user);
     }
 }
