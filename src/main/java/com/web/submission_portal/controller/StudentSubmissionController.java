@@ -10,6 +10,7 @@ import com.web.submission_portal.repository.StudentRepository;
 import com.web.submission_portal.repository.SubmissionRepository;
 import com.web.submission_portal.repository.UserRepository;
 import com.web.submission_portal.service.StorageService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -29,7 +30,8 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/student")
-@PreAuthorize("hasAnyAuthority('ROLE_STUDENT', 'ROLE_CR')")  // Fixed: Allow both roles
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('ROLE_STUDENT', 'ROLE_CR')")
 @Slf4j
 public class StudentSubmissionController {
 
@@ -39,24 +41,12 @@ public class StudentSubmissionController {
     private final SubmissionRepository submissionRepository;
     private final StorageService storageService;
 
-    public StudentSubmissionController(AssignmentRepository assignmentRepository,
-                                       StudentRepository studentRepository,
-                                       UserRepository userRepository,
-                                       SubmissionRepository submissionRepository,
-                                       StorageService storageService) {
-        this.assignmentRepository = assignmentRepository;
-        this.studentRepository = studentRepository;
-        this.userRepository = userRepository;
-        this.submissionRepository = submissionRepository;
-        this.storageService = storageService;
-    }
 
 
     @PostMapping("/submit/{id}/submit")
     public String submitAssignment(@PathVariable("id") Long assignmentId,
                                    @RequestParam("file") MultipartFile file,
                                    Authentication authentication,
-                                   Model model,
                                    RedirectAttributes redirectAttributes) {
         try {
             // 1. Validate file
@@ -157,7 +147,7 @@ public class StudentSubmissionController {
                 redirectAttributes.addFlashAttribute("success", "Assignment submitted successfully!");
             }
 
-            return "redirect:/student/dashboard";
+            return "redirect:/student/submit-assignment";
 
         } catch (Exception e) {
             log.error("Student submission failed: {}", e.getMessage(), e);

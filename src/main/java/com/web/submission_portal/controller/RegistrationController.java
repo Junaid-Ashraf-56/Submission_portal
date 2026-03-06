@@ -101,7 +101,7 @@ public class RegistrationController {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Failed to create account. Please try again.");
         }
-        return "redirect:/auth/register";
+        return "redirect:/auth/pending";
     }
 
     @GetMapping("/pending")

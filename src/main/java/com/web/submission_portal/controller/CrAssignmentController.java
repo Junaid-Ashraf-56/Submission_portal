@@ -146,7 +146,12 @@ public class CrAssignmentController {
             submissionCount.put(a.getAssignmentId(), count);
         }
 
-        long totalStudents = studentRepository.count();
+        long totalStudents = studentRepository.findAll()
+                .stream()
+                .filter(s -> s.getUniversity().equals(student.getUniversity())
+                        && s.getSection().equals(student.getSection())
+                        && s.getSemester().equals(student.getSemester()))
+                .count();
         model.addAttribute("createdAssignments", assignment);
         model.addAttribute("submissionCounts", submissionCount);
         model.addAttribute("totalStudents", totalStudents);

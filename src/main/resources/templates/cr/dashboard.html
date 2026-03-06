@@ -79,6 +79,17 @@
         <strong>Error!</strong> Failed to delete assignment.
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
+    <!-- Flash alerts from submission/other redirects -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show animate-slideInLeft" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <strong>Success!</strong> <span th:text="${success}">Operation completed</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show animate-slideInLeft" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>Error!</strong> <span th:text="${error}">Operation failed</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 
     <div class="mb-5">
         <div class="d-flex justify-content-between align-items-center mb-4 animate-slideInLeft">
