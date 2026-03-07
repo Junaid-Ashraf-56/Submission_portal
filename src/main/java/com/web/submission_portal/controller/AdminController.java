@@ -1,11 +1,16 @@
 package com.web.submission_portal.controller;
 
 
+import com.web.submission_portal.entity.Assignment;
 import com.web.submission_portal.entity.Student;
+import com.web.submission_portal.entity.Submission;
 import com.web.submission_portal.entity.User;
 import com.web.submission_portal.enums.AccountStatus;
 import com.web.submission_portal.enums.Role;
+import com.web.submission_portal.repository.ChatMessageRepository;
+import com.web.submission_portal.service.AssignmentService;
 import com.web.submission_portal.service.StudentService;
+import com.web.submission_portal.service.SubmissionService;
 import com.web.submission_portal.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +32,9 @@ import java.util.List;
 public class AdminController {
     private final UserService userService;
     private final StudentService studentService;
+    private final SubmissionService submissionService;
+    private final AssignmentService assignmentService;
+    private final ChatMessageRepository chatMessageRepository;
 
     @GetMapping("/admin-panel")
     public String adminPanel(Model model){
@@ -102,10 +110,21 @@ public class AdminController {
     }
 
     @PostMapping("/cr/reject")
-    public String rejectCR(@RequestParam String email, RedirectAttributes redirectAttributes) {
-
+    public String rejectCR(@RequestParam String email,
+                           RedirectAttributes redirectAttributes) {
         try {
-            if (DeleteUser(email, redirectAttributes)) return "redirect:/admin/admin-panel";
+            User user = userService.findByEmail(email);
+            if (user == null) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "No user found with email: " + email);
+                return "redirect:/admin/admin-panel";
+            }
+
+            Student student = studentService.findByUserId(user.getUserId());
+            if (student != null) {
+                studentService.deleteById(student.getStudentId());
+            }
+            userService.deleteById(user.getUserId());
 
             log.info("CR rejected and removed: email={}", email);
             redirectAttributes.addFlashAttribute("successMessage",
@@ -121,40 +140,106 @@ public class AdminController {
     }
 
     @PostMapping("/cr/delete")
-    public String deleteCR(@RequestParam String email, RedirectAttributes redirectAttributes) {
-
+    public String deleteCR(@RequestParam String email,
+                           RedirectAttributes redirectAttributes) {
         try {
-            if (DeleteUser(email, redirectAttributes)) return "redirect:/admin";
+            User crUser = userService.findByEmail(email);
+            if (crUser == null) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "No user found with email: " + email);
+                return "redirect:/admin/admin-panel";
+            }
 
-            log.info("CR deleted: email={}", email);
+            Student crStudent = studentService.findByUserId(crUser.getUserId());
+            if (crStudent == null) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "No CR profile found for email: " + email);
+                return "redirect:/admin/admin-panel";
+            }
+
+            List<Student> students = studentService.getStudentBySection(crStudent.getSection())
+                    .stream()
+                    .filter(s -> s.getUser().getRole() == Role.ROLE_STUDENT)
+                    .toList();
+
+            for (Student student : students) {
+                List<Submission> subs = submissionService.findByStudent(student);
+                subs.forEach(s -> submissionService.deleteById(s.getSubmissionId()));
+                studentService.deleteById(student.getStudentId());
+                userService.deleteById(student.getUser().getUserId());
+            }
+
+            List<Assignment> assignments = assignmentService.getAssignmentsByCreator(crUser);
+            for (Assignment assignment : assignments) {
+                submissionService.deleteByAssignment(assignment);
+                assignmentService.deleteById(assignment.getAssignmentId());
+            }
+
+            String roomId = crStudent.getAdmission() + "-" +
+                    crStudent.getProgram() + "-" +
+                    crStudent.getSection() + "-" +
+                    crStudent.getSemester();
+            chatMessageRepository.deleteByRoomId(roomId);
+
+            List<Submission> crSubs = submissionService.findByStudent(crStudent);
+            crSubs.forEach(s -> submissionService.deleteById(s.getSubmissionId()));
+
+            studentService.deleteById(crStudent.getStudentId());
+            userService.deleteById(crUser.getUserId());
+
+            log.info("CR fully deleted: email={}", email);
             redirectAttributes.addFlashAttribute("successMessage",
-                    "CR deleted successfully.");
+                    "CR and all associated data deleted successfully.");
 
         } catch (Exception e) {
             log.error("Failed to delete CR email={}: {}", email, e.getMessage());
             redirectAttributes.addFlashAttribute("errorMessage",
-                    "Failed to delete CR. Please try again.");
+                    "Failed to delete CR: " + e.getMessage());
         }
 
         return "redirect:/admin/admin-panel";
     }
 
-    private boolean DeleteUser(@RequestParam String email, RedirectAttributes redirectAttributes) {
-        User user = userService.findByEmail(email);
+    @PostMapping("/student/delete")
+    public String deleteStudent(@RequestParam Long userId,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            User user = userService.findByUserId(userId);
+            if (user == null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Student not found!");
+                return "redirect:/admin/admin-panel";
+            }
 
-        if (user == null) {
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    "No user found with email: " + email);
-            return true;
-        }
+            Student student = studentService.findByUserId(userId);
+            if (student == null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Student profile not found!");
+                return "redirect:/admin/admin-panel";
+            }
 
-        Student student = studentService.findByUserId(user.getUserId());
-        if (student != null) {
+            List<Submission> submissions = submissionService.findByStudent(student);
+            submissions.forEach(s -> submissionService.deleteById(s.getSubmissionId()));
+
+            if (user.getRole() == Role.ROLE_CR) {
+                List<Assignment> assignments = assignmentService.getAssignmentsByCreator(user);
+                for (Assignment assignment : assignments) {
+                    submissionService.deleteByAssignment(assignment);
+                    assignmentService.deleteById(assignment.getAssignmentId());
+                }
+            }
+
             studentService.deleteById(student.getStudentId());
+            userService.deleteById(userId);
+
+            log.info("Student deleted by admin: userId={}", userId);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Student deleted successfully.");
+
+        } catch (Exception e) {
+            log.error("Failed to delete student userId={}: {}", userId, e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Failed to delete student: " + e.getMessage());
         }
 
-
-        userService.deleteById(user.getUserId());
-        return false;
+        return "redirect:/admin/admin-panel";
     }
 }

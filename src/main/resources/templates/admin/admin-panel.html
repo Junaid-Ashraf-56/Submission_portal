@@ -10,6 +10,83 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
+    <style>
+        .delete-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .delete-overlay.active { display: flex; }
+        .delete-modal {
+            background: #1e1e2e;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 480px;
+            width: 90%;
+        }
+        .delete-modal h5 { color: #f87171; font-weight: 700; margin-bottom: 0.25rem; }
+        .delete-target-name { color: white; font-size: 1rem; font-weight: 600; margin-bottom: 1rem; }
+        .delete-list {
+            list-style: none;
+            padding: 1rem;
+            margin: 0 0 1rem 0;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+        }
+        .delete-list li {
+            color: rgba(255,255,255,0.65);
+            font-size: 0.85rem;
+            padding: 0.35rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .delete-list li:last-child { border-bottom: none; }
+        .delete-list li i { color: #f87171; flex-shrink: 0; }
+        .delete-warning {
+            background: rgba(248,113,113,0.1);
+            border: 1px solid rgba(248,113,113,0.3);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: #f87171;
+            font-size: 0.82rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .delete-modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
+        .btn-cancel-del {
+            background: rgba(255,255,255,0.08);
+            border: none;
+            color: rgba(255,255,255,0.7);
+            padding: 0.6rem 1.4rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .btn-cancel-del:hover { background: rgba(255,255,255,0.14); }
+        .btn-confirm-del {
+            background: #dc2626;
+            border: none;
+            color: white;
+            padding: 0.6rem 1.4rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .btn-confirm-del:hover { background: #b91c1c; }
+    </style>
 </head>
 <body>
 
@@ -96,12 +173,8 @@
             <span th:text="${errorMessage}"></span>
         </div>
 
-        <!-- ═══════════════════════════════════════
-             TAB 1: DASHBOARD
-        ════════════════════════════════════════ -->
+        <!-- ═══════════ TAB 1: DASHBOARD ═══════════ -->
         <div class="tab-section active" id="tab-dashboard">
-
-            <!-- Stat cards -->
             <div class="row g-3 mb-4">
                 <div class="col-sm-6 col-xl-3">
                     <div class="stat-card">
@@ -141,7 +214,6 @@
                 </div>
             </div>
 
-            <!-- Pending requests preview (max 5) -->
             <div class="panel">
                 <div class="panel-header">
                     <h5><i class="bi bi-bell-fill"></i> Pending CR Requests</h5>
@@ -149,42 +221,34 @@
                         View All <i class="bi bi-arrow-right"></i>
                     </button>
                 </div>
-
                 <div th:if="${pendingRequests != null and !pendingRequests.isEmpty()}">
                     <table class="data-table">
                         <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>University</th>
-                            <th>Requested</th>
-                            <th>Action</th>
+                            <th>Name</th><th>Email</th><th>University</th><th>Requested</th><th>Action</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:each="req, s : ${pendingRequests}" th:if="${s.index < 5}">
                             <td>
                                 <div class="user-cell">
-                                    <div class="user-avatar avatar-orange"
-                                         th:text="${req.name.substring(0,1)}">A</div>
+                                    <div class="user-avatar avatar-orange" th:text="${req.name.substring(0,1)}">A</div>
                                     <div>
                                         <div class="user-name" th:text="${req.name}">Name</div>
-                                        <div class="user-sub"  th:text="${req.rollNo}">Roll</div>
+                                        <div class="user-sub" th:text="${req.rollNo}">Roll</div>
                                     </div>
                                 </div>
                             </td>
-                            <td th:text="${req.user.email}"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a5c0c8c4ccc9e5c0dd8bc6cac8">[email&#160;protected]</a></td>
+                            <td th:text="${req.user.email}">email</td>
                             <td th:text="${req.university}">University</td>
                             <td th:text="${#temporals.format(req.user.createdAt,'dd MMM yyyy')}">01 Jan 2026</td>
                             <td>
-                                <!-- Approve -->
                                 <form th:action="@{/admin/cr/approve}" method="POST" style="display:inline">
                                     <input type="hidden" name="email" th:value="${req.user.email}">
                                     <button type="submit" class="btn-action btn-approve">
                                         <i class="bi bi-check-lg"></i> Approve
                                     </button>
                                 </form>
-                                <!-- Reject -->
                                 <form th:action="@{/admin/cr/reject}" method="POST" style="display:inline">
                                     <input type="hidden" name="email" th:value="${req.user.email}">
                                     <button type="submit" class="btn-action btn-reject ms-1"
@@ -197,18 +261,14 @@
                         </tbody>
                     </table>
                 </div>
-
                 <div th:if="${pendingRequests == null or pendingRequests.isEmpty()}" class="empty-state">
                     <i class="bi bi-inbox"></i>
                     <p>No pending CR registration requests.</p>
                 </div>
             </div>
-
         </div>
 
-        <!-- ═══════════════════════════════════════
-             TAB 2: ALL CRs
-        ════════════════════════════════════════ -->
+        <!-- ═══════════ TAB 2: ALL CRs ═══════════ -->
         <div class="tab-section" id="tab-cr-list">
             <div class="panel">
                 <div class="panel-header">
@@ -237,8 +297,6 @@
                         </thead>
                         <tbody id="crTableBody">
                         <th:block th:each="cr, stat : ${crs}">
-
-                            <!-- CR row -->
                             <tr>
                                 <td style="width:40px;">
                                     <button class="cr-expand-btn"
@@ -248,8 +306,7 @@
                                 </td>
                                 <td>
                                     <div class="user-cell">
-                                        <div class="user-avatar avatar-blue"
-                                             th:text="${cr.name.substring(0,1)}">C</div>
+                                        <div class="user-avatar avatar-blue" th:text="${cr.name.substring(0,1)}">C</div>
                                         <div>
                                             <div class="user-name" th:text="${cr.name}">CR Name</div>
                                             <div class="user-sub">Class Representative</div>
@@ -259,25 +316,26 @@
                                 <td th:text="${cr.rollNo}">sp24-bse-000</td>
                                 <td th:text="${cr.section}">A</td>
                                 <td th:text="${cr.university}">University</td>
-                                <td th:text="${cr.user.email}"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f1949c90989db19489df929e9c">[email&#160;protected]</a></td>
+                                <td th:text="${cr.user.email}">email</td>
                                 <td>
-                                        <span class="badge-status"
-                                              th:classappend="${cr.gender.name() == 'MALE'} ? 'badge-male' : 'badge-female'"
-                                              th:text="${cr.gender}">MALE</span>
+                                    <span class="badge-status"
+                                          th:classappend="${cr.gender.name() == 'MALE'} ? 'badge-male' : 'badge-female'"
+                                          th:text="${cr.gender}">MALE</span>
                                 </td>
                                 <td>
-                                        <span class="badge-status badge-active"
-                                              th:text="${cr.studentCount != null ? cr.studentCount : '—'}">5</span>
+                                    <span class="badge-status badge-active"
+                                          th:text="${cr.studentCount != null ? cr.studentCount : '—'}">5</span>
                                 </td>
+                                <!-- ── CR DELETE BUTTON ── -->
                                 <td>
-                                    <form th:action="@{/admin/cr/delete}" method="POST"
-                                          onsubmit="return confirm('Delete this CR and all their data?')">
-                                        <!-- email used as identifier -->
-                                        <input type="hidden" name="email" th:value="${cr.user.email}">
-                                        <button type="submit" class="btn-action btn-delete-sm">
-                                            <i class="bi bi-trash3"></i>
-                                        </button>
-                                    </form>
+                                    <button class="btn-action btn-delete-sm"
+                                            th:data-email="${cr.user.email}"
+                                            th:data-name="${cr.name}"
+                                            th:data-section="${cr.section}"
+                                            th:data-count="${cr.studentCount != null ? cr.studentCount : 0}"
+                                            onclick="openCRDeleteModal(this)">
+                                        <i class="bi bi-trash3"></i> Delete
+                                    </button>
                                 </td>
                             </tr>
 
@@ -288,30 +346,25 @@
                                         <table class="data-table">
                                             <thead>
                                             <tr>
-                                                <th>Student Name</th>
-                                                <th>Roll No</th>
-                                                <th>Email</th>
-                                                <th>Phone</th>
-                                                <th>Gender</th>
+                                                <th>Student Name</th><th>Roll No</th>
+                                                <th>Email</th><th>Phone</th><th>Gender</th>
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <tr th:each="stu : ${cr.students}"
-                                                th:if="${cr.students != null}">
+                                            <tr th:each="stu : ${cr.students}" th:if="${cr.students != null}">
                                                 <td>
                                                     <div class="user-cell">
-                                                        <div class="user-avatar avatar-green"
-                                                             th:text="${stu.name.substring(0,1)}">S</div>
+                                                        <div class="user-avatar avatar-green" th:text="${stu.name.substring(0,1)}">S</div>
                                                         <div class="user-name" th:text="${stu.name}">Student</div>
                                                     </div>
                                                 </td>
                                                 <td th:text="${stu.rollNo}">sp24-bse-001</td>
-                                                <td th:text="${stu.user.email}"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8cfff8f9cce9f4a2efe3e1">[email&#160;protected]</a></td>
+                                                <td th:text="${stu.user.email}">email</td>
                                                 <td th:text="${stu.phoneNumber != null ? stu.phoneNumber : '—'}">—</td>
                                                 <td>
-                                                            <span class="badge-status"
-                                                                  th:classappend="${stu.gender.name() == 'MALE'} ? 'badge-male' : 'badge-female'"
-                                                                  th:text="${stu.gender}">MALE</span>
+                                                    <span class="badge-status"
+                                                          th:classappend="${stu.gender.name() == 'MALE'} ? 'badge-male' : 'badge-female'"
+                                                          th:text="${stu.gender}">MALE</span>
                                                 </td>
                                             </tr>
                                             <tr th:if="${cr.students == null or cr.students.isEmpty()}">
@@ -325,7 +378,6 @@
                                     </div>
                                 </td>
                             </tr>
-
                         </th:block>
                         </tbody>
                     </table>
@@ -338,9 +390,7 @@
             </div>
         </div>
 
-        <!-- ═══════════════════════════════════════
-             TAB 3: ALL STUDENTS
-        ════════════════════════════════════════ -->
+        <!-- ═══════════ TAB 3: ALL STUDENTS ═══════════ -->
         <div class="tab-section" id="tab-students-list">
             <div class="panel">
                 <div class="panel-header">
@@ -364,28 +414,38 @@
                             <th>University</th>
                             <th>Gender</th>
                             <th>CR</th>
+                            <th>Action</th>
                         </tr>
                         </thead>
                         <tbody id="stuTableBody">
                         <tr th:each="stu : ${allStudents}">
                             <td>
                                 <div class="user-cell">
-                                    <div class="user-avatar avatar-green"
-                                         th:text="${stu.name.substring(0,1)}">S</div>
+                                    <div class="user-avatar avatar-green" th:text="${stu.name.substring(0,1)}">S</div>
                                     <div class="user-name" th:text="${stu.name}">Student</div>
                                 </div>
                             </td>
                             <td th:text="${stu.rollNo}">sp24-bse-001</td>
-                            <td th:text="${stu.user.email}"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="116265645174693f727e7c">[email&#160;protected]</a></td>
+                            <td th:text="${stu.user.email}">email</td>
                             <td th:text="${stu.phoneNumber != null ? stu.phoneNumber : '—'}">—</td>
                             <td th:text="${stu.section}">A</td>
                             <td th:text="${stu.university}">University</td>
                             <td>
-                                    <span class="badge-status"
-                                          th:classappend="${stu.gender.name() == 'MALE'} ? 'badge-male' : 'badge-female'"
-                                          th:text="${stu.gender}">MALE</span>
+                                <span class="badge-status"
+                                      th:classappend="${stu.gender.name() == 'MALE'} ? 'badge-male' : 'badge-female'"
+                                      th:text="${stu.gender}">MALE</span>
                             </td>
                             <td th:text="${stu.crName != null ? stu.crName : '—'}">CR Name</td>
+                            <!-- ── STUDENT DELETE BUTTON ── -->
+                            <td>
+                                <button class="btn-action btn-delete-sm"
+                                        th:data-userid="${stu.user.userId}"
+                                        th:data-name="${stu.name}"
+                                        th:data-rollno="${stu.rollNo}"
+                                        onclick="openStudentDeleteModal(this)">
+                                    <i class="bi bi-trash3"></i> Delete
+                                </button>
+                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -398,9 +458,7 @@
             </div>
         </div>
 
-        <!-- ═══════════════════════════════════════
-             TAB 4: CR REQUESTS
-        ════════════════════════════════════════ -->
+        <!-- ═══════════ TAB 4: CR REQUESTS ═══════════ -->
         <div class="tab-section" id="tab-cr-requests">
             <div class="panel">
                 <div class="panel-header">
@@ -416,23 +474,15 @@
                     <table class="data-table">
                         <thead>
                         <tr>
-                            <th>Applicant</th>
-                            <th>Roll No</th>
-                            <th>Email</th>
-                            <th>Section</th>
-                            <th>University</th>
-                            <th>Phone</th>
-                            <th>Gender</th>
-                            <th>Requested On</th>
-                            <th>Actions</th>
+                            <th>Applicant</th><th>Roll No</th><th>Email</th><th>Section</th>
+                            <th>University</th><th>Phone</th><th>Gender</th><th>Requested On</th><th>Actions</th>
                         </tr>
                         </thead>
                         <tbody id="reqTableBody">
                         <tr th:each="req : ${pendingRequests}">
                             <td>
                                 <div class="user-cell">
-                                    <div class="user-avatar avatar-orange"
-                                         th:text="${req.name.substring(0,1)}">A</div>
+                                    <div class="user-avatar avatar-orange" th:text="${req.name.substring(0,1)}">A</div>
                                     <div>
                                         <div class="user-name" th:text="${req.name}">Name</div>
                                         <div class="user-sub">Awaiting approval</div>
@@ -440,26 +490,24 @@
                                 </div>
                             </td>
                             <td th:text="${req.rollNo}">sp24-bse-051</td>
-                            <td th:text="${req.user.email}"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="51322311243f387f343524">[email&#160;protected]</a></td>
+                            <td th:text="${req.user.email}">email</td>
                             <td th:text="${req.section}">A</td>
                             <td th:text="${req.university}">University</td>
                             <td th:text="${req.phoneNumber != null ? req.phoneNumber : '—'}">—</td>
                             <td>
-                                    <span class="badge-status"
-                                          th:classappend="${req.gender.name() == 'MALE'} ? 'badge-male' : 'badge-female'"
-                                          th:text="${req.gender}">MALE</span>
+                                <span class="badge-status"
+                                      th:classappend="${req.gender.name() == 'MALE'} ? 'badge-male' : 'badge-female'"
+                                      th:text="${req.gender}">MALE</span>
                             </td>
                             <td th:text="${#temporals.format(req.user.createdAt,'dd MMM yyyy')}">01 Jan 2026</td>
                             <td>
                                 <div class="d-flex gap-1 flex-wrap">
-                                    <!-- Approve — passes email -->
                                     <form th:action="@{/admin/cr/approve}" method="POST">
                                         <input type="hidden" name="email" th:value="${req.user.email}">
                                         <button type="submit" class="btn-action btn-approve">
                                             <i class="bi bi-check-lg"></i> Approve
                                         </button>
                                     </form>
-                                    <!-- Reject — passes email -->
                                     <form th:action="@{/admin/cr/reject}" method="POST">
                                         <input type="hidden" name="email" th:value="${req.user.email}">
                                         <button type="submit" class="btn-action btn-reject"
@@ -484,7 +532,118 @@
     </div><!-- /content -->
 </div><!-- /main -->
 
+<!-- ═══════════════════════════════════════
+     CR DELETE CONFIRMATION MODAL
+════════════════════════════════════════ -->
+<div class="delete-overlay" id="crDeleteOverlay">
+    <div class="delete-modal">
+        <h5><i class="bi bi-exclamation-triangle-fill me-2"></i>Delete CR Account</h5>
+        <div class="delete-target-name" id="crDeleteName">CR Name — Section A</div>
+
+        <p style="color:rgba(255,255,255,0.5); font-size:0.85rem; margin-bottom:0.75rem;">
+            The following will be permanently deleted:
+        </p>
+        <ul class="delete-list">
+            <li><i class="bi bi-person-x-fill"></i> CR account and profile</li>
+            <li><i class="bi bi-people-fill"></i> All students in this CR's section</li>
+            <li><i class="bi bi-file-earmark-x-fill"></i> All assignments created by this CR</li>
+            <li><i class="bi bi-cloud-slash-fill"></i> All student submissions and uploaded files</li>
+            <li><i class="bi bi-chat-x-fill"></i> All class chat messages</li>
+            <li><i class="bi bi-shield-lock-fill"></i> All login credentials</li>
+        </ul>
+        <div class="delete-warning">
+            <i class="bi bi-exclamation-octagon-fill"></i>
+            <strong>This action cannot be undone.</strong> All data will be permanently lost.
+        </div>
+        <div class="delete-modal-actions">
+            <button class="btn-cancel-del" onclick="closeCRDeleteModal()">
+                <i class="bi bi-x-lg me-1"></i>Cancel
+            </button>
+            <form id="crDeleteForm" th:action="@{/admin/cr/delete}" method="POST" style="margin:0;">
+                <input type="hidden" name="email" id="crDeleteEmail">
+                <button type="submit" class="btn-confirm-del">
+                    <i class="bi bi-trash3-fill"></i> Yes, Delete Everything
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     STUDENT DELETE CONFIRMATION MODAL
+════════════════════════════════════════ -->
+<div class="delete-overlay" id="studentDeleteOverlay">
+    <div class="delete-modal">
+        <h5><i class="bi bi-exclamation-triangle-fill me-2"></i>Delete Student Account</h5>
+        <div class="delete-target-name" id="studentDeleteName">Student Name</div>
+
+        <p style="color:rgba(255,255,255,0.5); font-size:0.85rem; margin-bottom:0.75rem;">
+            The following will be permanently deleted:
+        </p>
+        <ul class="delete-list">
+            <li><i class="bi bi-person-x-fill"></i> Student account and profile</li>
+            <li><i class="bi bi-file-earmark-x-fill"></i> All assignment submissions</li>
+            <li><i class="bi bi-cloud-slash-fill"></i> All uploaded files in storage</li>
+            <li><i class="bi bi-shield-lock-fill"></i> Login credentials and access rights</li>
+        </ul>
+        <div class="delete-warning">
+            <i class="bi bi-exclamation-octagon-fill"></i>
+            <strong>This action cannot be undone.</strong>
+        </div>
+        <div class="delete-modal-actions">
+            <button class="btn-cancel-del" onclick="closeStudentDeleteModal()">
+                <i class="bi bi-x-lg me-1"></i>Cancel
+            </button>
+            <form id="studentDeleteForm" th:action="@{/admin/student/delete}" method="POST" style="margin:0;">
+                <input type="hidden" name="userId" id="studentDeleteUserId">
+                <button type="submit" class="btn-confirm-del">
+                    <i class="bi bi-trash3-fill"></i> Yes, Delete Student
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/admin-panel.js}"></script>
+<script>
+    // ── CR Delete Modal ──────────────────────────
+    function openCRDeleteModal(btn) {
+        const name    = btn.getAttribute('data-name');
+        const section = btn.getAttribute('data-section');
+        const email   = btn.getAttribute('data-email');
+        const count   = btn.getAttribute('data-count');
+
+        document.getElementById('crDeleteName').textContent =
+            name + ' — Section ' + section + ' (' + count + ' students)';
+        document.getElementById('crDeleteEmail').value = email;
+        document.getElementById('crDeleteOverlay').classList.add('active');
+    }
+    function closeCRDeleteModal() {
+        document.getElementById('crDeleteOverlay').classList.remove('active');
+    }
+
+    // ── Student Delete Modal ─────────────────────
+    function openStudentDeleteModal(btn) {
+        const name   = btn.getAttribute('data-name');
+        const rollNo = btn.getAttribute('data-rollno');
+        const userId = btn.getAttribute('data-userid');
+
+        document.getElementById('studentDeleteName').textContent = name + ' — ' + rollNo;
+        document.getElementById('studentDeleteUserId').value = userId;
+        document.getElementById('studentDeleteOverlay').classList.add('active');
+    }
+    function closeStudentDeleteModal() {
+        document.getElementById('studentDeleteOverlay').classList.remove('active');
+    }
+
+    // Close modals when clicking outside
+    document.getElementById('crDeleteOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeCRDeleteModal();
+    });
+    document.getElementById('studentDeleteOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeStudentDeleteModal();
+    });
+</script>
 </body>
 </html>
