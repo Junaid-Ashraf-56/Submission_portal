@@ -12,6 +12,7 @@ import com.web.submission_portal.service.AssignmentService;
 import com.web.submission_portal.service.StudentService;
 import com.web.submission_portal.service.SubmissionService;
 import com.web.submission_portal.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -139,6 +140,7 @@ public class AdminController {
         return "redirect:/admin/admin-panel";
     }
 
+    @Transactional
     @PostMapping("/cr/delete")
     public String deleteCR(@RequestParam String email,
                            RedirectAttributes redirectAttributes) {
