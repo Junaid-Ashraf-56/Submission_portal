@@ -47,9 +47,9 @@ public class AdminController {
 
         List<Student> allStudents = studentService.findAllStudents();
         allStudents.forEach(stu -> {
-            Student cr = studentService.findCRBySectionAndUniversity(
-                    stu.getSection(), stu.getUniversity(),Role.ROLE_CR);
-            stu.setCrName(cr != null ? cr.getName() : null);
+            List<Student> crList = studentService.findCRBySectionAndUniversity(
+                    stu.getSection(), stu.getUniversity(), Role.ROLE_CR);
+            stu.setCrName(!crList.isEmpty() ? crList.get(0).getCrName() : null);
         });
 
         model.addAttribute("pendingRequests",  pendingRequests);
@@ -152,6 +152,7 @@ public class AdminController {
         if (student != null) {
             studentService.deleteById(student.getStudentId());
         }
+
 
         userService.deleteById(user.getUserId());
         return false;

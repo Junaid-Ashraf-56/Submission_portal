@@ -99,11 +99,23 @@
                         <i class="bi bi-exclamation-triangle-fill me-2"></i>
                         <span th:text="${error}">Error message</span>
                     </div>
+                    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <strong>Success!</strong> <span th:text="${success}">Submitted</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>Error!</strong> <span th:text="${error}">Failed</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
 
                     <!-- Upload Form -->
                     <form th:action="@{/student/submit/{id}/submit(id=${assignment.assignmentId})}"
                           method="POST"
                           enctype="multipart/form-data">
+
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
                         <div class="mb-4">
                             <label class="form-label fw-semibold mb-3">

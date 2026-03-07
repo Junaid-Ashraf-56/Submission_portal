@@ -59,7 +59,7 @@ public class StudentService {
         return studentRepository.findStudentsByUserRoleAndStatus(role,accountStatus);
     }
 
-    public Student findCRBySectionAndUniversity(String section,String university,Role role){
+    public List<Student> findCRBySectionAndUniversity(String section, String university, Role role){
         return studentRepository.findCRBySectionAndUniversity(section,university,role);
     }
 

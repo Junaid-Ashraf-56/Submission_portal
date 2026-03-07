@@ -104,8 +104,7 @@ public class StudentSubmissionController {
                 } catch (Exception e) {
                     log.warn("Failed to delete old file: {}", e.getMessage());
                 }
-            }
-
+            };
             // 10. Upload to Supabase
             Map<String, String> fileInfo = storageService.uploadFile(file, assignmentId, student.getStudentId());
 
@@ -147,7 +146,7 @@ public class StudentSubmissionController {
                 redirectAttributes.addFlashAttribute("success", "Assignment submitted successfully!");
             }
 
-            return "redirect:/student/submit-assignment";
+            return "redirect:/student/dashboard";
 
         } catch (Exception e) {
             log.error("Student submission failed: {}", e.getMessage(), e);

@@ -34,15 +34,15 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
                                                   @Param("status") AccountStatus status);
 
     @Query("""
-       SELECT s FROM Student s
-       JOIN s.user u
-       WHERE s.section = :section
-       AND s.university = :university
-       AND u.role = :role
-       """)
-    Student findCRBySectionAndUniversity(@Param("section") String section,
-                                         @Param("university") String university,
-                                         @Param("role") Role role);
+   SELECT s FROM Student s
+   JOIN s.user u
+   WHERE s.section = :section
+   AND s.university = :university
+   AND u.role = :role
+   """)
+    List<Student> findCRBySectionAndUniversity(@Param("section") String section,
+                                               @Param("university") String university,
+                                               @Param("role") Role role);
 
 }
 
