@@ -202,6 +202,7 @@ public class AdminController {
         return "redirect:/admin/admin-panel";
     }
 
+    @Transactional
     @PostMapping("/student/delete")
     public String deleteStudent(@RequestParam Long userId,
                                 RedirectAttributes redirectAttributes) {
