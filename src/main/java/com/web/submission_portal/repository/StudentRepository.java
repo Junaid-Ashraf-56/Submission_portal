@@ -21,6 +21,8 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
     Student findByRollNo(String rollNo);
     List<Student> findBySectionAndUniversity(String section,String university);
     List<Student> findAll();
+
+    List<Student> findAllByUserRole(Role userRole);
     Integer countBySectionAndUniversity(String section,String university);
 
     Student getStudentsBySemesterAndSectionAndProgramAndAdmission(String semester,String section,String program,String Admission);

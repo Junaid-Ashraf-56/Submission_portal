@@ -45,8 +45,9 @@ public class StudentService {
     public Student getByRollNo(String rollNo){
         return studentRepository.findByRollNo(rollNo);
     }
+
     public List<Student> findAllStudents(){
-        return studentRepository.findAll();
+        return studentRepository.findAllByUserRole(Role.ROLE_STUDENT);
     }
     public int countStudentsBySectionAndUniversity(String section,String university){
         return studentRepository.countBySectionAndUniversity(section,university);
