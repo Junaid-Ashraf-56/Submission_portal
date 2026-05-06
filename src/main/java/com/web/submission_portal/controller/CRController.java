@@ -88,7 +88,7 @@ public class CRController {
             student.setName(name);
             student.setRollNo(rollNo);
             student.setPhoneNumber(phoneNumber);
-            student.setSection(section);
+            student.setSection(crStudent.getSection());
             student.setProgram(crStudent.getProgram());
             student.setSemester(crStudent.getSemester());
             student.setUniversity(crStudent.getUniversity());
