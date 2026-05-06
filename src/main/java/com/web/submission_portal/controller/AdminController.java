@@ -45,19 +45,16 @@ public class AdminController {
         List<Student> crs = studentService.findByRoleAndStatus(Role.ROLE_CR,AccountStatus.APPROVED);
 
         crs.forEach(cr -> {
-            int count = studentService.countStudentsBySectionAndUniversity(
-                    cr.getSection(), cr.getUniversity());
+            int count = studentService.countStudentsBySectionAndUniversity(cr.getSection(), cr.getUniversity());
             cr.setStudentCount(count);
 
-            List<Student> crStudents = studentService.findBySectionAndUniversity(
-                    cr.getSection(), cr.getUniversity());
+            List<Student> crStudents = studentService.findBySectionAndUniversity(cr.getSection(), cr.getUniversity());
             cr.setStudents(crStudents);
         });
 
         List<Student> allStudents = studentService.findAllStudents();
         allStudents.forEach(stu -> {
-            List<Student> crList = studentService.findCRBySectionAndUniversity(
-                    stu.getSection(), stu.getUniversity(), Role.ROLE_CR);
+            List<Student> crList = studentService.findCRBySectionAndUniversity(stu.getSection(), stu.getUniversity(), Role.ROLE_CR);
             stu.setCrName(!crList.isEmpty() ? crList.get(0).getCrName() : null);
         });
 
@@ -83,14 +80,12 @@ public class AdminController {
             User user = userService.findByEmail(email);
 
             if (user == null) {
-                redirectAttributes.addFlashAttribute("errorMessage",
-                        "No user found with email: " + email);
+                redirectAttributes.addFlashAttribute("errorMessage", "No user found with email: " + email);
                 return "redirect:/admin/admin-panel";
             }
 
             if (user.getStatus() == AccountStatus.APPROVED) {
-                redirectAttributes.addFlashAttribute("errorMessage",
-                        "This CR is already active.");
+                redirectAttributes.addFlashAttribute("errorMessage", "This CR is already active.");
                 return "redirect:/admin/admin-panel";
             }
 
@@ -98,26 +93,22 @@ public class AdminController {
             userService.save(user);
 
             log.info("CR approved: email={}", email);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "CR account approved: " + email);
+            redirectAttributes.addFlashAttribute("successMessage", "CR account approved: " + email);
 
         } catch (Exception e) {
             log.error("Failed to approve CR email={}: {}", email, e.getMessage());
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    "Failed to approve CR. Please try again.");
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to approve CR. Please try again.");
         }
 
         return "redirect:/admin/admin-panel";
     }
 
     @PostMapping("/cr/reject")
-    public String rejectCR(@RequestParam String email,
-                           RedirectAttributes redirectAttributes) {
+    public String rejectCR(@RequestParam String email, RedirectAttributes redirectAttributes) {
         try {
             User user = userService.findByEmail(email);
             if (user == null) {
-                redirectAttributes.addFlashAttribute("errorMessage",
-                        "No user found with email: " + email);
+                redirectAttributes.addFlashAttribute("errorMessage", "No user found with email: " + email);
                 return "redirect:/admin/admin-panel";
             }
 
@@ -128,13 +119,11 @@ public class AdminController {
             userService.deleteById(user.getUserId());
 
             log.info("CR rejected and removed: email={}", email);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "CR request rejected and removed.");
+            redirectAttributes.addFlashAttribute("successMessage", "CR request rejected and removed.");
 
         } catch (Exception e) {
             log.error("Failed to reject CR email={}: {}", email, e.getMessage());
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    "Failed to reject CR. Please try again.");
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to reject CR. Please try again.");
         }
 
         return "redirect:/admin/admin-panel";
@@ -147,15 +136,13 @@ public class AdminController {
         try {
             User crUser = userService.findByEmail(email);
             if (crUser == null) {
-                redirectAttributes.addFlashAttribute("errorMessage",
-                        "No user found with email: " + email);
+                redirectAttributes.addFlashAttribute("errorMessage", "No user found with email: " + email);
                 return "redirect:/admin/admin-panel";
             }
 
             Student crStudent = studentService.findByUserId(crUser.getUserId());
             if (crStudent == null) {
-                redirectAttributes.addFlashAttribute("errorMessage",
-                        "No CR profile found for email: " + email);
+                redirectAttributes.addFlashAttribute("errorMessage", "No CR profile found for email: " + email);
                 return "redirect:/admin/admin-panel";
             }
 
