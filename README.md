@@ -1,8 +1,10 @@
 <div align="center">
 
-# 📚 Assignment Portal
+<img src="https://img.shields.io/badge/Status-Live%20🟢-success?style=for-the-badge" alt="Live" />
 
-### A production-grade university assignment submission system
+# Assignment Portal
+
+**A production-grade university assignment submission system**
 
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.6-brightgreen?style=flat-square&logo=springboot)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-17-orange?style=flat-square&logo=openjdk)](https://openjdk.org/)
@@ -10,9 +12,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=flat-square&logo=docker)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
 
-**[Live Demo](https://assignmentportal.live)** · **[Report Bug](https://github.com/Junaid-Ashraf-56/Submission_portal/issues)** · **[Request Feature](https://github.com/Junaid-Ashraf-56/Submission_portal/issues)**
-
-![Assignment Portal Banner](https://img.shields.io/badge/Status-Live%20%F0%9F%9F%A2-success?style=for-the-badge)
+**[🌐 Live Demo](https://assignmentportal.live)** · **[🐛 Report Bug](https://github.com/Junaid-Ashraf-56/Submission_portal/issues)** · **[✨ Request Feature](https://github.com/Junaid-Ashraf-56/Submission_portal/issues)**
 
 </div>
 
@@ -21,6 +21,7 @@
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
+- [Screenshots](#-screenshots)
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
 - [Architecture](#-architecture)
@@ -30,56 +31,79 @@
 - [API Routes](#-api-routes)
 - [Database Schema](#-database-schema)
 - [Project Structure](#-project-structure)
+- [Roadmap](#-roadmap)
 - [Contributing](#-contributing)
+- [Author](#-author)
 
 ---
 
 ## 🌟 Overview
 
-Assignment Portal is a full-stack web application built for university environments. It enables a structured workflow between **Admins**, **Class Representatives (CRs)**, and **Students** — covering assignment creation, file submission, deadline management, and real-time class communication.
+Assignment Portal is a full-stack web application built for university environments. It models a real-world three-tier academic workflow between **Admins**, **Class Representatives (CRs)**, and **Students** — covering assignment creation, file submission, deadline management, and real-time class communication.
 
-> Built as a first production project, deployed at [assignmentportal.live](https://assignmentportal.live) on DigitalOcean with Docker, Nginx, and Let's Encrypt SSL.
+Built and deployed independently as a first production project over 3 months — live at [assignmentportal.live](https://assignmentportal.live) on DigitalOcean with Docker, Nginx, and Let's Encrypt SSL.
+
+**Why I built this:** Assignment management at university was scattered across WhatsApp groups and email threads. This portal centralizes it — with proper auth, role separation, file storage, and real-time chat — the way a production system should work.
+
+---
+
+## 📸 Screenshots
+
+> Add screenshots to a `docs/screenshots/` folder in the repository and update the paths below.
+
+### Landing Page
+![Landing Page](docs/screenshots/landing.png)
+
+### Admin Dashboard
+![Admin Dashboard](docs/screenshots/admin-dashboard.png)
+
+### CR Dashboard — Assignment Tracking
+![CR Dashboard](docs/screenshots/cr-dashboard.png)
+
+### Student Dashboard — Active Assignments
+![Student Dashboard](docs/screenshots/student-dashboard.png)
+
+### Real-time Class Chat
+![Class Chat](docs/screenshots/chat.png)
 
 ---
 
 ## ✨ Features
 
 ### 🔐 Authentication & Security
-- Email-based OTP verification before account activation
-- Role-based access control (`ROLE_ADMIN`, `ROLE_CR`, `ROLE_STUDENT`)
+- Email-based OTP verification before account activation (async delivery for zero-latency redirects)
+- Role-based access control — `ROLE_ADMIN`, `ROLE_CR`, `ROLE_STUDENT`
 - `PENDING → ACTIVE` account approval workflow
 - Forgot password via OTP with 1-minute expiry
 - Spring Security session management with CSRF protection
-- Async OTP email delivery for zero-latency redirects
 
 ### 👨‍💼 Admin
-- Approve / reject / delete CR registration requests
+- Approve, reject, or delete CR registration requests
 - View all CRs with expandable student lists per section
 - Dashboard stats — total CRs, students, pending requests
-- Email-based actions (no userId exposure)
+- All actions are email-based (no userId exposure in URLs)
 
 ### 🎓 Class Representative (CR)
 - Register with OTP verification → admin approval flow
 - Create assignments with subject code, type (LAB/THEORY), and deadline
-- Track submission progress per assignment with progress bar
-- Download all student submissions as ZIP
+- Visual submission progress bar per assignment
+- Download all student submissions as a ZIP archive
 - Extend assignment deadlines
-- Edit profile — section/semester changes **cascade to all linked students**
+- Profile edits (section/semester) **cascade automatically to all linked students**
 - Real-time class chat via WebSocket
 
 ### 🧑‍🎓 Student
-- View active assignments from their CR
+- View active assignments posted by their CR
 - Submit assignments (file upload to Supabase Storage)
 - Track submission status per assignment
 - Real-time class chat with classmates
 
 ### 💬 Real-time Class Chat
 - WebSocket (STOMP over SockJS)
-- Auto-scoped chat rooms: `{admission}-{program}-{section}-{semester}`
+- Chat rooms auto-scoped by `{admission}-{program}-{section}-{semester}` — students only see their own class
 - Messages persisted to PostgreSQL
-- Loads last 50 messages on panel open
-- Unread message badge when panel is closed
-- Isolated — only classmates in the same room
+- Last 50 messages loaded on panel open
+- Unread message badge when chat panel is closed
 
 ---
 
@@ -146,17 +170,19 @@ Assignment Portal is a full-stack web application built for university environme
 - Java 17+
 - Maven 3.8+
 - Docker + Docker Compose
-- PostgreSQL 15 (or use Docker)
+- PostgreSQL 15 (or use the Docker Compose setup — no local install needed)
 
-### Local Development
+### Local Setup
 
 **1. Clone the repository**
+
 ```bash
 git clone https://github.com/Junaid-Ashraf-56/Submission_portal.git
 cd Submission_portal
 ```
 
 **2. Create `src/main/resources/application.properties`**
+
 ```properties
 spring.application.name=submission_portal
 
@@ -187,15 +213,18 @@ spring.mail.properties.mail.smtp.starttls.enable=true
 otp.expiry.minutes=1
 ```
 
-**3. Create `docker-compose.yml`** with your environment variables (see [Environment Variables](#-environment-variables))
+**3. Set your environment variables** — see [Environment Variables](#-environment-variables) below, then add them to a `docker-compose.yml` or a `.env` file.
 
 **4. Build and run**
+
 ```bash
 mvn clean package -DskipTests
 docker compose up --build
 ```
 
 **5. Open** `http://localhost:8080`
+
+> The PostgreSQL container spins up automatically via Docker Compose — no separate DB installation needed.
 
 ---
 
@@ -210,37 +239,37 @@ docker compose up --build
 | `SUPABASE_KEY` | Supabase service role key |
 | `SUPABASE_BUCKET_NAME` | Storage bucket name |
 | `MAIL_USERNAME` | Gmail address for OTP emails |
-| `MAIL_PASSWORD` | Gmail app password (not account password) |
+| `MAIL_PASSWORD` | Gmail app password (not your account password) |
 
-> ⚠️ Never commit `application.properties` or `docker-compose.yml` with real credentials. Both are in `.gitignore`.
+> ⚠️ Never commit `application.properties` or `docker-compose.yml` with real credentials. Both files are in `.gitignore`.
 
 ---
 
 ## 🌐 Deployment
 
-This project is deployed on DigitalOcean using Docker + Nginx + Let's Encrypt.
+Deployed on DigitalOcean using Docker + Nginx + Let's Encrypt.
 
-### Stack
 ```
 assignmentportal.live
-      ↓ DNS (Namecheap A Record)
-DigitalOcean Droplet (Ubuntu 22.04)
-      ↓ Nginx (port 443 → 8080, WebSocket proxy)
+      ↓ DNS (Namecheap A Record → DigitalOcean IP)
+DigitalOcean Droplet — Ubuntu 22.04
+      ↓ Nginx (443 → 8080, WebSocket proxy headers)
 Docker Compose
-      ├── submission_portal_app (Spring Boot)
-      └── submission_portal_db  (PostgreSQL 15)
+      ├── submission_portal_app  (Spring Boot :8080)
+      └── submission_portal_db   (PostgreSQL 15)
 ```
 
-### Update Production
+### Updating Production
+
 ```bash
-# SSH into server
+# SSH into the droplet
 ssh root@YOUR_DROPLET_IP
 
-# Pull latest code
+# Pull latest changes
 cd /opt/Submission_portal
 git pull origin main
 
-# Rebuild and restart
+# Rebuild and restart with zero manual downtime steps
 mvn clean package -DskipTests
 docker compose down
 docker compose up --build -d
@@ -250,19 +279,21 @@ docker compose up --build -d
 
 ## 🗺 API Routes
 
-| Method | Route | Role | Description |
+| Method | Route | Access | Description |
 |---|---|---|---|
 | GET | `/` | Public | Landing page |
 | GET/POST | `/auth/login` | Public | Login |
 | GET/POST | `/auth/register` | Public | CR registration |
 | GET/POST | `/auth/verify-otp` | Public | OTP verification |
+| GET/POST | `/auth/forgot-password` | Public | Password reset via OTP |
 | GET | `/cr/dashboard` | CR | CR dashboard |
-| GET | `/cr/manage-students` | CR | Student management |
+| GET | `/cr/manage-students` | CR | View/manage students |
 | POST | `/cr/create-assignment` | CR | Create assignment |
-| GET | `/cr/assignments/{id}/submissions` | CR | View submissions |
-| GET | `/cr/assignments/{id}/download-all` | CR | Download ZIP |
+| GET | `/cr/assignments/{id}/submissions` | CR | View submission progress |
+| GET | `/cr/assignments/{id}/download-all` | CR | Download all submissions as ZIP |
+| POST | `/cr/assignments/{id}/extend` | CR | Extend deadline |
 | GET | `/student/dashboard` | Student | Student dashboard |
-| POST | `/student/assignments/{id}/submit` | Student | Submit assignment |
+| POST | `/student/assignments/{id}/submit` | Student | File submission |
 | GET | `/admin/panel` | Admin | Admin dashboard |
 | POST | `/admin/cr/approve` | Admin | Approve CR |
 | POST | `/admin/cr/reject` | Admin | Reject CR |
@@ -290,7 +321,7 @@ students
 
 assignments
 ├── assignment_id (PK)
-├── created_by (FK → students)
+├── created_by (FK → students)  ← CR's student record
 ├── subject_title, subject_code
 ├── assignment_type (LAB / THEORY)
 ├── description
@@ -300,12 +331,12 @@ submissions
 ├── id (PK)
 ├── assignment_id (FK → assignments)
 ├── student_id (FK → students)
-├── file_url (Supabase)
+├── file_url (Supabase Storage)
 └── submitted_at
 
 chat_messages
 ├── id (PK)
-├── room_id (admission-program-section-semester)
+├── room_id ({admission}-{program}-{section}-{semester})
 ├── sender_name
 ├── content
 └── sent_at
@@ -318,8 +349,8 @@ chat_messages
 ```
 src/main/java/com/web/submission_portal/
 ├── config/
-│   ├── SecurityConfig.java
-│   └── WebSocketConfig.java
+│   ├── SecurityConfig.java          ← Spring Security + session rules
+│   └── WebSocketConfig.java         ← STOMP broker + endpoint registration
 ├── controller/
 │   ├── AdminController.java
 │   ├── AuthController.java
@@ -339,34 +370,59 @@ src/main/java/com/web/submission_portal/
 │   ├── SubmissionRepository.java
 │   └── UserRepository.java
 └── service/
-    ├── EmailService.java          ← @Async OTP delivery
+    ├── EmailService.java            ← @Async OTP delivery
     ├── OTPGeneratorService.java
     ├── PasswordResetService.java
     └── StudentService.java
 
 src/main/resources/
 ├── templates/
-│   ├── admin/, auth/, cr/, student/
+│   ├── admin/
+│   ├── auth/
+│   ├── cr/
+│   └── student/
 └── static/
-    ├── css/  (theme.css, cr-dashboard.css, student-dashboard.css)
-    └── js/   (cr-chat.js, student-chat.js)
+    ├── css/
+    │   ├── theme.css
+    │   ├── cr-dashboard.css
+    │   └── student-dashboard.css
+    └── js/
+        ├── cr-chat.js
+        └── student-chat.js
 ```
+
+---
+
+## 🗺 Roadmap
+
+- [ ] REST API layer + separate frontend (React/Vue)
+- [ ] Email notifications on new assignment creation
+- [ ] Assignment submission reminders before deadline
+- [ ] File type and size validation on submission
+- [ ] Submission history and re-submission support
+- [ ] Admin analytics dashboard (submission trends, late submitters)
+- [ ] CI/CD pipeline via GitHub Actions
 
 ---
 
 ## 🤝 Contributing
 
+Contributions are welcome. Here's the standard flow:
+
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Commit your changes (`git commit -m 'Add some feature'`)
-4. Push to the branch (`git push origin feature/your-feature`)
-5. Open a Pull Request
+2. Create a feature branch — `git checkout -b feature/your-feature`
+3. Commit your changes — `git commit -m 'feat: add your feature'`
+4. Push to the branch — `git push origin feature/your-feature`
+5. Open a Pull Request with a clear description of what changed and why
+
+Please open an issue first if you're planning a large change, so we can discuss the approach.
 
 ---
 
 ## 👤 Author
 
 **Junaid Ashraf**
+
 - GitHub: [@Junaid-Ashraf-56](https://github.com/Junaid-Ashraf-56)
 - Live Project: [assignmentportal.live](https://assignmentportal.live)
 
@@ -374,6 +430,6 @@ src/main/resources/
 
 <div align="center">
 
-⭐ Star this repo if you found it helpful!
+If this project was useful to you, consider giving it a ⭐ — it helps.
 
 </div>
