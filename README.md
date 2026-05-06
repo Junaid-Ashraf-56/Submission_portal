@@ -49,22 +49,20 @@ Built and deployed independently as a first production project over 3 months —
 
 ## 📸 Screenshots
 
-> Add screenshots to a `docs/screenshots/` folder in the repository and update the paths below.
-
 ### Landing Page
-![Landing Page](docs/screenshots/landing.png)
+![Landing Page](assets/landing.png)
 
 ### Admin Dashboard
-![Admin Dashboard](docs/screenshots/admin-dashboard.png)
+![Admin Dashboard](assets/admin.png)
 
 ### CR Dashboard — Assignment Tracking
-![CR Dashboard](docs/screenshots/cr-dashboard.png)
+![CR Dashboard](assets/cr.png)
 
 ### Student Dashboard — Active Assignments
-![Student Dashboard](docs/screenshots/student-dashboard.png)
+![Student Dashboard](assets/student.png)
 
 ### Real-time Class Chat
-![Class Chat](docs/screenshots/chat.png)
+![Class Chat](assets/message.png)
 
 ---
 
