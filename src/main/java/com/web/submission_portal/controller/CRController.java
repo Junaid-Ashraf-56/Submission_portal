@@ -55,12 +55,10 @@ public class CRController {
                              @RequestParam String rollNo,
                              @RequestParam String email,
                              @RequestParam(required = false) String phoneNumber,
-                             @RequestParam(required = false) String section,
                              @RequestParam Gender gender,
                              RedirectAttributes redirectAttributes,
                              Authentication authentication) {
         try {
-            // Check if email or roll number already exists
             if (userService.existsByEmail(email)) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Email already exists!");
                 return "redirect:/cr/manage-students?error";
@@ -73,7 +71,7 @@ public class CRController {
 
             User user = User.builder()
                     .email(email)
-                    .password(passwordEncoder.encode("student123")) // Default password
+                    .password(passwordEncoder.encode("student123"))
                     .role(Role.ROLE_STUDENT)
                     .status(AccountStatus.APPROVED)
                     .build();
@@ -83,20 +81,16 @@ public class CRController {
             User crUser = userService.findByEmail(authentication.getName());
             Student crStudent = studentService.findByUserId(crUser.getUserId());
 
-
             Student student = new Student();
             student.setUser(savedUser);
             student.setName(name);
             student.setRollNo(rollNo);
             student.setPhoneNumber(phoneNumber);
+            student.setGender(gender);
             student.setSection(crStudent.getSection());
             student.setProgram(crStudent.getProgram());
             student.setSemester(crStudent.getSemester());
             student.setUniversity(crStudent.getUniversity());
-            student.setAdmission(crStudent.getAdmission());
-            student.setGender(gender);
-            student.setProgram(crStudent.getProgram());
-            student.setSemester(crStudent.getSemester());
             student.setAdmission(crStudent.getAdmission());
 
             studentService.save(student);
