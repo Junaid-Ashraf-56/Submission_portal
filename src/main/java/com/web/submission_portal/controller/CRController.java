@@ -45,6 +45,7 @@ public class CRController {
 
         model.addAttribute("crName", student.getName());
         model.addAttribute("students", students);
+        model.addAttribute("crSection", student.getSection());
 
         return "cr/manage-students";
     }
@@ -129,7 +130,6 @@ public class CRController {
             student.setName(name);
             student.setPhoneNumber(phoneNumber);
             student.setGender(gender);
-            student.setSection(section);
 
             studentService.save(student);
 
