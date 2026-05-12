@@ -1,0 +1,26 @@
+name: submission_portal
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy Via SSh
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key:  ${{ secrets.SSH_Key }}
+          script: |
+            cd /opt/Submission_portal
+            git pull origin main
+            docker compose up -d --build
+
+

@@ -111,7 +111,6 @@ public class CRController {
                                 @RequestParam String name,
                                 @RequestParam(required = false) String phoneNumber,
                                 @RequestParam Gender gender,
-                                @RequestParam(required = false) String section,
                                 RedirectAttributes redirectAttributes) {
         try {
             Student student = studentService.findByUserId(userId);
@@ -280,7 +279,7 @@ public class CRController {
                 assignmentService.deleteById(assignment.getAssignmentId());
             }
 
-            // 4. Delete chat messages for this class room
+            // 4. Delete chat messages for this classroom
             String roomId = crStudent.getAdmission() + "-" +
                     crStudent.getProgram() + "-" +
                     crStudent.getSection() + "-" +
