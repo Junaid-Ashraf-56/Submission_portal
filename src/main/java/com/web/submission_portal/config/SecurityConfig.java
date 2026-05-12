@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .requestMatchers("/css/**","/js/**","/").permitAll()
                         .requestMatchers("/auth/**","/contact","/","/auth/register").permitAll()
                         .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/assets/**").permitAll()
 			            .requestMatchers("/favicon.ico").permitAll()
                         .requestMatchers("/chat/**").authenticated()
                         .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
