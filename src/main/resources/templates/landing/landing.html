@@ -191,42 +191,53 @@
 <!-- Contact Section -->
 <section id="contact" class="contact-section">
     <div class="container">
-        <h2 class="section-title text-white">Get In Touch</h2>
-        <p class="section-subtitle text-white mb-5">Have questions? We'd love to hear from you.</p>
+        <h2 class="section-title text-white">Meet the Developer</h2>
+        <p class="section-subtitle text-white mb-5">The person behind Assignment Portal</p>
 
-        <!-- Success/Error Messages -->
-        <div th:if="${success}" class="alert alert-success mb-4">
-            <i class="bi bi-check-circle me-2"></i>
-            <span th:text="${success}">Success message</span>
-        </div>
+        <div class="creator-card">
+            <!-- Left: Info -->
+            <div class="creator-info">
+                <div class="creator-badge">👨‍💻 Builder & Developer</div>
+                <h2 class="creator-name">Junaid Ashraf</h2>
+                <p class="creator-role">
+                    <i class="bi bi-mortarboard-fill me-2"></i>CS Student · COMSATS University Islamabad
+                </p>
+                <p class="creator-bio">
+                    Passionate backend engineer who built Assignment Portal from scratch to solve real classroom problems.
+                    Focused on Java, Spring Boot, and scalable web systems.
+                </p>
 
-        <div th:if="${error}" class="alert alert-danger mb-4">
-            <i class="bi bi-x-circle me-2"></i>
-            <span th:text="${error}">Error message</span>
-        </div>
+                <div class="creator-links">
+                    <a href="mailto:junaidashraf.code@gmail.com" class="creator-link link-email">
+                        <i class="bi bi-envelope-fill"></i>
+                        <span>junaidashraf.code@gmail.com</span>
+                    </a>
+                    <a href="https://junaidashraf.tech/" target="_blank" class="creator-link link-portfolio">
+                        <i class="bi bi-globe2"></i>
+                        <span>junaidashraf.tech</span>
+                    </a>
+                    <a href="https://www.linkedin.com/in/junaid-ashraf56/" target="_blank" class="creator-link link-linkedin">
+                        <i class="bi bi-linkedin"></i>
+                        <span>linkedin.com/in/junaid-ashraf56</span>
+                    </a>
+                    <a href="https://github.com/Junaid-Ashraf-56" target="_blank" class="creator-link link-github">
+                        <i class="bi bi-github"></i>
+                        <span>github.com/Junaid-Ashraf-56</span>
+                    </a>
+                </div>
 
-        <div class="contact-form">
-            <form th:action="@{/contact}" method="POST" onsubmit="console.log('✅ Form submitting!'); return true;">
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Your Name</label>
-                    <input type="text" class="form-control" name="name" placeholder="your name" required>
+                <a href="mailto:junaidashraf.code@gmail.com?subject=Assignment Portal Inquiry" class="btn btn-contact-email">
+                    <i class="bi bi-send-fill me-2"></i>Send me an Email
+                </a>
+            </div>
+
+            <!-- Right: Photo -->
+            <div class="creator-photo-wrapper">
+                <div class="creator-photo-ring">
+                    <img th:src="@{/assets/me.jpeg}" src="/images/me.jpeg" alt="Junaid Ashraf" class="creator-photo">
                 </div>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Email Address</label>
-                    <input type="email" class="form-control" name="email" placeholder="your email" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Subject</label>
-                    <input type="text" class="form-control" name="subject" placeholder="How can we help?" required>
-                </div>
-                <div class="mb-4">
-                    <label class="form-label fw-semibold">Message</label>
-                    <textarea class="form-control" name="message" rows="5" placeholder="Tell us more..." required></textarea>
-                </div>
-                <button type="submit" class="btn btn-submit">
-                    <i class="bi bi-send me-2"></i>Send Message
-                </button>
-            </form>
+                <div class="creator-photo-glow"></div>
+            </div>
         </div>
     </div>
 </section>
