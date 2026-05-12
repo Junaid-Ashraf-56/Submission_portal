@@ -21,6 +21,7 @@ jobs:
           script: |
             cd /opt/Submission_portal
             git pull origin main
+            mvn clean package -DskipTests
             docker compose up -d --build --force-recreate --remove-orphans
 
 
