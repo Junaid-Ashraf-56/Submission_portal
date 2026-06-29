@@ -119,6 +119,9 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.web.submission_portal.SubmissionPortalApplication</mainClass>
+                </configuration>
 			</plugin>
 
             <plugin>
