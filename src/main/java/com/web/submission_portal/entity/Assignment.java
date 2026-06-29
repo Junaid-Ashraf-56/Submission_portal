@@ -46,6 +46,9 @@ public class Assignment {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Builder.Default
+    private Boolean reminderEmailSent = false;
+
     @OneToMany(mappedBy = "assignment",
             cascade = CascadeType.ALL,
             orphanRemoval = true)

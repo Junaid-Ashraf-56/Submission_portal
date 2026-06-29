@@ -1,6 +1,8 @@
 package com.web.submission_portal.service;
 
 import com.web.submission_portal.entity.EmailLog;
+import com.web.submission_portal.entity.Assignment;
+import com.web.submission_portal.entity.Student;
 import com.web.submission_portal.enums.EmailStatus;
 import com.web.submission_portal.repository.EmailLogsRepository;
 import jakarta.mail.MessagingException;
@@ -21,6 +23,8 @@ import java.util.concurrent.TimeoutException;
 @RequiredArgsConstructor
 @Slf4j
 public class EmailService {
+
+    private static final String ADMIN_EMAIL = "submissionportal.cr@gmail.com";
 
     private final JavaMailSender mailSender;
     private final EmailLogsRepository emailLogsRepository;
@@ -68,6 +72,54 @@ public class EmailService {
             throw new RuntimeException("Failed to send email: " + e.getMessage());
         }
     }
+
+    public void sendCrRegistrationRequestEmail(Student crStudent) {
+        String subject = "New CR account request needs review";
+        String htmlContent = buildCrRegistrationRequestTemplate(crStudent);
+
+        try {
+            sendEmailWithTimeout(ADMIN_EMAIL, subject, htmlContent);
+        } catch (Exception e) {
+            log.error("Failed to notify admin about CR request for {}: {}",
+                    crStudent.getUser().getEmail(), e.getMessage());
+        }
+    }
+
+    public void sendCrApprovalEmail(String toEmail) {
+        String subject = "Your Assignment Portal account is approved";
+        String htmlContent = buildCrApprovalTemplate();
+
+        try {
+            sendEmailWithTimeout(toEmail, subject, htmlContent);
+        } catch (Exception e) {
+            log.error("Failed to send CR approval email to {}: {}", toEmail, e.getMessage());
+        }
+    }
+
+    public void sendAssignmentCreatedEmail(Student student, Student crStudent, Assignment assignment) {
+        String subject = "New assignment: " + assignment.getSubjectTitle();
+        String htmlContent = buildAssignmentCreatedTemplate(student, crStudent, assignment);
+
+        try {
+            sendEmailWithTimeout(student.getUser().getEmail(), subject, htmlContent);
+        } catch (Exception e) {
+            log.error("Failed to send assignment notification to {} for assignment {}: {}",
+                    student.getUser().getEmail(), assignment.getAssignmentId(), e.getMessage());
+        }
+    }
+
+    public void sendAssignmentDeadlineReminderEmail(Student student, Student crStudent, Assignment assignment) {
+        String subject = "30 minutes left: " + assignment.getSubjectTitle();
+        String htmlContent = buildAssignmentDeadlineReminderTemplate(student, crStudent, assignment);
+
+        try {
+            sendEmailWithTimeout(student.getUser().getEmail(), subject, htmlContent);
+        } catch (Exception e) {
+            log.error("Failed to send deadline reminder to {} for assignment {}: {}",
+                    student.getUser().getEmail(), assignment.getAssignmentId(), e.getMessage());
+        }
+    }
+
     private void sendEmailWithTimeout(String toEmail, String subject, String htmlContent)
             throws Exception {
 
@@ -110,6 +162,129 @@ public class EmailService {
             emailLogsRepository.save(emailLog);
         }
     }
+
+    private String buildCrRegistrationRequestTemplate(Student crStudent) {
+        return baseTemplate("New CR Account Request", """
+                <p>Hello Admin,</p>
+                <p>A new CR registration request needs your attention. Please review it from the admin panel.</p>
+                <div class="info-box"><span class="label">Name:</span> %s</div>
+                <div class="info-box"><span class="label">Email:</span> %s</div>
+                <div class="info-box"><span class="label">Roll No:</span> %s</div>
+                <div class="info-box"><span class="label">Class:</span> %s - %s - %s - Semester %s</div>
+                <div class="info-box"><span class="label">University:</span> %s</div>
+                <p style="text-align:center;margin-top:30px;">
+                    <a href="https://assignmentportal.live/auth/login" class="button">Open Admin Panel</a>
+                </p>
+                """.formatted(
+                escapeHtml(crStudent.getName()),
+                escapeHtml(crStudent.getUser().getEmail()),
+                escapeHtml(crStudent.getRollNo()),
+                escapeHtml(crStudent.getAdmission()),
+                escapeHtml(crStudent.getProgram()),
+                escapeHtml(crStudent.getSection()),
+                escapeHtml(crStudent.getSemester()),
+                escapeHtml(crStudent.getUniversity())
+        ));
+    }
+
+    private String buildCrApprovalTemplate() {
+        return baseTemplate("Account Approved", """
+                <p>Hello,</p>
+                <p>Your Assignment Portal account has been approved successfully. You can now sign in and access your CR dashboard.</p>
+                <p style="text-align:center;margin-top:30px;">
+                    <a href="https://assignmentportal.live/auth/login" class="button">Login Now</a>
+                </p>
+                <p>Best regards,<br><strong>Assignment Portal Team</strong></p>
+                """);
+    }
+
+    private String buildAssignmentCreatedTemplate(Student student, Student crStudent, Assignment assignment) {
+        return baseTemplate("New Assignment Created", """
+                <p>Hello %s,</p>
+                <p>%s has created a new assignment for your class.</p>
+                <div class="info-box"><span class="label">Subject:</span> %s (%s)</div>
+                <div class="info-box"><span class="label">Type:</span> %s</div>
+                <div class="info-box"><span class="label">Start Time:</span> %s</div>
+                <div class="info-box"><span class="label">End Time:</span> %s</div>
+                <div class="message-box"><span class="label">Description:</span><p>%s</p></div>
+                <p>Please submit your work before the deadline.</p>
+                """.formatted(
+                escapeHtml(student.getName()),
+                escapeHtml(crStudent.getName()),
+                escapeHtml(assignment.getSubjectTitle()),
+                escapeHtml(assignment.getSubjectCode()),
+                assignment.getAssignmentType(),
+                assignment.getStartTime(),
+                assignment.getEndTime(),
+                escapeHtml(assignment.getDescription())
+        ));
+    }
+
+    private String buildAssignmentDeadlineReminderTemplate(Student student, Student crStudent, Assignment assignment) {
+        return baseTemplate("Assignment Deadline Reminder", """
+                <p>Hello %s,</p>
+                <p>You have not submitted this assignment yet. Only <strong>30 minutes</strong> are left before the deadline.</p>
+                <div class="info-box"><span class="label">Subject:</span> %s (%s)</div>
+                <div class="info-box"><span class="label">CR:</span> %s</div>
+                <div class="info-box"><span class="label">Deadline:</span> %s</div>
+                <p>Please submit it as soon as possible.</p>
+                """.formatted(
+                escapeHtml(student.getName()),
+                escapeHtml(assignment.getSubjectTitle()),
+                escapeHtml(assignment.getSubjectCode()),
+                escapeHtml(crStudent.getName()),
+                assignment.getEndTime()
+        ));
+    }
+
+    private String baseTemplate(String heading, String bodyContent) {
+        return """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
+                    .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                    .header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 3px solid #667eea; }
+                    .logo { font-size: 24px; font-weight: bold; color: #667eea; }
+                    .content { color: #333; line-height: 1.6; }
+                    .info-box { background-color: #f7fafc; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #667eea; }
+                    .label { font-weight: bold; color: #667eea; }
+                    .message-box { background-color: #fff; border: 2px solid #e2e8f0; padding: 15px; border-radius: 8px; margin: 20px 0; }
+                    .button { background-color: #4F46E5; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; }
+                    .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #666; font-size: 12px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <div class="logo">Assignment Portal</div>
+                        <p style="color: #718096; margin-top: 10px;">%s</p>
+                    </div>
+                    <div class="content">
+                        %s
+                    </div>
+                    <div class="footer">
+                        <p>This is an automated email. Please do not reply.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """.formatted(escapeHtml(heading), bodyContent);
+    }
+
+    private String escapeHtml(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
+    }
+
     private String buildContactFormTemplate(String name, String email, String topic, String message) {
         return """
             <!DOCTYPE html>

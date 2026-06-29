@@ -18,6 +18,15 @@ public interface AssignmentRepository extends JpaRepository<Assignment,Long> {
     void deleteByCreatedBy(User user);
     Assignment findFirstByAssignmentId(Long assignmentId);
     List<Assignment> findByCreatedBy(User user);
+
+    @Query("""
+            SELECT a FROM Assignment a
+            WHERE a.endTime BETWEEN :from AND :to
+            AND (a.reminderEmailSent = false OR a.reminderEmailSent IS NULL)
+            """)
+    List<Assignment> findAssignmentsNeedingDeadlineReminder(@Param("from") LocalDateTime from,
+                                                            @Param("to") LocalDateTime to);
+
     @Query("SELECT a FROM Assignment a " +
             "JOIN Student s ON a.createdBy.userId = s.user.userId " +
             "WHERE s.section = :section AND s.user.role = 'ROLE_CR'")

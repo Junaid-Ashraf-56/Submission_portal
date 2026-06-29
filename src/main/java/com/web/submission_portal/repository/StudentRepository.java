@@ -28,6 +28,23 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
     Student getStudentsBySemesterAndSectionAndProgramAndAdmission(String semester,String section,String program,String Admission);
     List<Student> getStudentsBySemesterAndSectionAndAdmissionAndProgram(String semester,String section,String Admission,String program);
 
+    @Query("""
+            SELECT s FROM Student s
+            JOIN s.user u
+            WHERE s.university = :university
+            AND s.admission = :admission
+            AND s.program = :program
+            AND s.section = :section
+            AND s.semester = :semester
+            AND u.role = 'ROLE_STUDENT'
+            AND u.status = 'APPROVED'
+            """)
+    List<Student> findApprovedStudentsInClass(@Param("university") String university,
+                                               @Param("admission") String admission,
+                                               @Param("program") String program,
+                                               @Param("section") String section,
+                                               @Param("semester") String semester);
+
 
     @Query("SELECT s FROM Student s " +
             "JOIN s.user u " +
@@ -47,4 +64,3 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
                                                @Param("role") Role role);
 
 }
-

@@ -9,6 +9,7 @@ import com.web.submission_portal.repository.StudentRepository;
 import com.web.submission_portal.repository.SubmissionRepository;
 import com.web.submission_portal.repository.UserRepository;
 import com.web.submission_portal.service.AssignmentService;
+import com.web.submission_portal.service.EmailService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -31,17 +32,20 @@ public class CrAssignmentController {
     private final AssignmentRepository assignmentRepository;
     private final StudentRepository studentRepository;
     private final SubmissionRepository submissionRepository;
+    private final EmailService emailService;
 
     public CrAssignmentController(UserRepository userRepository,
                                   AssignmentService assignmentService,
                                   StudentRepository studentRepository,
                                   AssignmentRepository assignmentRepository,
-                                  SubmissionRepository submissionRepository) {
+                                  SubmissionRepository submissionRepository,
+                                  EmailService emailService) {
         this.userRepository = userRepository;
         this.assignmentService = assignmentService;
         this.studentRepository = studentRepository;
         this.assignmentRepository = assignmentRepository;
         this.submissionRepository = submissionRepository;
+        this.emailService = emailService;
     }
 
     @GetMapping("/create-assignment")
@@ -57,6 +61,7 @@ public class CrAssignmentController {
 
         String email = authentication.getName();
         User user = userRepository.findByEmail(email).orElseThrow();
+        Student crStudent = studentRepository.findByUser(user).orElseThrow();
         assignment.setCreatedBy(user);
         assignment.setCreatedAt(LocalDateTime.now());
 
@@ -65,6 +70,14 @@ public class CrAssignmentController {
             return "cr/create-assignment";
         }
         assignmentService.createAssignment(assignment);
+        List<Student> students = studentRepository.findApprovedStudentsInClass(
+                crStudent.getUniversity(),
+                crStudent.getAdmission(),
+                crStudent.getProgram(),
+                crStudent.getSection(),
+                crStudent.getSemester()
+        );
+        students.forEach(student -> emailService.sendAssignmentCreatedEmail(student, crStudent, assignment));
         return "redirect:/cr/dashboard";
     }
 

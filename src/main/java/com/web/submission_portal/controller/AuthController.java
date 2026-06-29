@@ -126,11 +126,6 @@ public class AuthController {
 
             if ("register".equals(flow)){
                 String pendingOTP = (String) session.getAttribute("pendingOTP");
-                System.out.println("These are the otps ");
-                System.out.println(pendingOTP);
-                System.out.println(otp);
-                log.debug("Session ID: {}", session.getId());
-                log.debug("pendingOTP: {}", session.getAttribute("pendingOTP"));
                 log.debug("flow: {}", session.getAttribute("flow"));
                 if (!otp.equals(pendingOTP)) {
                     throw new RuntimeException("Invalid OTP. Please check and try again.");
@@ -159,6 +154,7 @@ public class AuthController {
                 crAsStudent.setAdmission((String) session.getAttribute("pendingAdmission"));
 
                 studentService.save(crAsStudent);
+                emailService.sendCrRegistrationRequestEmail(crAsStudent);
 
 
                 session.removeAttribute("pendingName");

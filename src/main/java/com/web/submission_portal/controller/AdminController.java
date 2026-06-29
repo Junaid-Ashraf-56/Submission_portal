@@ -9,6 +9,7 @@ import com.web.submission_portal.enums.AccountStatus;
 import com.web.submission_portal.enums.Role;
 import com.web.submission_portal.repository.ChatMessageRepository;
 import com.web.submission_portal.service.AssignmentService;
+import com.web.submission_portal.service.EmailService;
 import com.web.submission_portal.service.StudentService;
 import com.web.submission_portal.service.SubmissionService;
 import com.web.submission_portal.service.UserService;
@@ -35,6 +36,7 @@ public class AdminController {
     private final StudentService studentService;
     private final SubmissionService submissionService;
     private final AssignmentService assignmentService;
+    private final EmailService emailService;
     private final ChatMessageRepository chatMessageRepository;
 
     @GetMapping("/admin-panel")
@@ -91,6 +93,7 @@ public class AdminController {
 
             user.setStatus(AccountStatus.APPROVED);
             userService.save(user);
+            emailService.sendCrApprovalEmail(email);
 
             log.info("CR approved: email={}", email);
             redirectAttributes.addFlashAttribute("successMessage", "CR account approved: " + email);
